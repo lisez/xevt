@@ -210,7 +210,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         const handlers = this.handlers.get(f) || [];
         const profile = new ContextProfile(f, [], handlers);
         this.executor.emit(profile);
-        this.executor.exec();
+        this.delayExec(() => this.executor.exec());
       }
 
       nextWaiting = nextWaiting.concat(fulfill);

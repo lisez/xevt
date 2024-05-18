@@ -60,6 +60,7 @@ export type XCoreEmitter<T> =
   & {
     eventNames(): EventName[];
     emit(event: EventName, ...args: any[]): void;
+    delayExec(callback: (...args: any[]) => void): void;
   }
   & EventUnregister<T>;
 

@@ -25,12 +25,18 @@ export class ContextExecutor<
   }
 
   private useLast(ctx: T) {
-    this.block(ctx);
+    this.queue = this.queue.map((p) => {
+      if (p.name === ctx.name) {
+        const targetHandlers = p.useLastHandlers();
+        p.removeHandlers(targetHandlers);
+      }
+      return p;
+    });
 
     if (this.current && ctx.name === this.current.name) {
       const targetHandlers = ctx.useLastHandlers();
       this.current.block(targetHandlers);
-      const shouldSuspend = targetHandlers.includes(
+      const shouldSuspend = this.current.value && targetHandlers.includes(
         this.current.value.handler as any,
       );
       if (shouldSuspend) this.current?.suspend();
@@ -38,15 +44,6 @@ export class ContextExecutor<
   }
 
   private useFirst(ctx: T) {
-    this.block(ctx);
-
-    if (this.current && ctx.name === this.current.name) {
-      const targetHandlers = ctx.useFirstHandlers();
-      this.current.block(targetHandlers);
-    }
-  }
-
-  private block(ctx: T) {
     this.queue = this.queue.map((p) => {
       if (p.name === ctx.name) {
         const targetHandlers = p.useFirstHandlers();
@@ -54,6 +51,11 @@ export class ContextExecutor<
       }
       return p;
     });
+
+    if (this.current && ctx.name === this.current.name) {
+      const targetHandlers = ctx.useFirstHandlers();
+      this.current.block(targetHandlers);
+    }
   }
 
   private *getContext() {

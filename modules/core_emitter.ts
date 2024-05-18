@@ -28,7 +28,12 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     name: EventName,
     signature: EventHandlerSignature<any>,
   ): void {
-    if (signature.options.async && !("then" in signature.handler)) {
+    if (
+      signature.options.async &&
+      // @ts-ignore TS7053
+      ((signature.handler[Symbol.toStringTag] !== "AsyncFunction") &&
+        !("then" in signature.handler))
+    ) {
       throw new Error("Async handler must be a promise or thenable");
     }
     if (
@@ -42,6 +47,16 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
       handlers.push(signature);
     } else {
       this.handlers.set(name, [signature]);
+    }
+  }
+
+  delayExec(callback: (...args: any[]) => void): void {
+    // @ts-ignore TS2304
+    if (typeof requestAnimationFrame !== "undefined") {
+      // @ts-ignore TS2304
+      requestAnimationFrame(callback);
+    } else {
+      setTimeout(callback, 0);
     }
   }
 
