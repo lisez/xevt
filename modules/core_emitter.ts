@@ -18,6 +18,8 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     this.executor = new ContextExecutor(this.off, queue);
   }
 
+  delay: number = 4;
+
   eventNames(): EventName[] {
     return Array.from(this.handlers.keys()).flat();
   }
@@ -52,11 +54,11 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   delayExec(callback: (...args: any[]) => void): void {
     // @ts-ignore TS2304
-    if (typeof requestAnimationFrame !== "undefined") {
+    if (this.delay === 0 && typeof requestAnimationFrame == "function") {
       // @ts-ignore TS2304
       requestAnimationFrame(callback);
     } else {
-      setTimeout(callback, 0);
+      setTimeout(callback, this.delay);
     }
   }
 
@@ -79,4 +81,6 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   get removeEventListener() {
     return this.off;
   }
+
+  abstract flush(): void;
 }

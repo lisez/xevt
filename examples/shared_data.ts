@@ -8,7 +8,7 @@ const sharedQueue: any[] = [];
 const emitter1 = new Emitter(sharedHandlers, sharedQueue);
 const emitter2 = new ConjoinEmitter(sharedHandlers, sharedQueue);
 
-emitter1.leadAsync("test", async (args) => {
+emitter1.on("test", async (args) => {
   console.log("event test", JSON.stringify(args));
 }, { signal: new AbortController() });
 
