@@ -24,22 +24,26 @@ export class ContextProfile<T = EventName> implements ExecutingContext<T> {
 
   get useFirst(): boolean {
     this.hasFirst ??= this.hasFirst ||
-      this.signatures.some((s) => s.options.lead);
+      this.signatures.some((s) => !!s.options?.lead);
     return this.hasFirst;
   }
 
   useFirstHandlers() {
-    return this.signatures.filter((s) => s.options.lead).map((s) => s.handler);
+    return this.signatures.filter((s) => !!s.options?.lead).map((s) =>
+      s.handler
+    );
   }
 
   get useLast(): boolean {
     this.hasLast ??= this.hasLast ||
-      this.signatures.some((s) => s.options.last);
+      this.signatures.some((s) => !!s.options?.last);
     return this.hasLast;
   }
 
   useLastHandlers() {
-    return this.signatures.filter((s) => s.options.last).map((s) => s.handler);
+    return this.signatures.filter((s) => !!s.options?.last).map((s) =>
+      s.handler
+    );
   }
 
   removeHandlers(handlers: EventHandler[]) {

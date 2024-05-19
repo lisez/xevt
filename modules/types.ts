@@ -12,11 +12,14 @@ export type EventOptions = {
 export type EventHandlerSignature<T> = {
   name: T;
   handler: EventHandler;
-  options: EventOptions & {
-    async: boolean;
-    lead: boolean;
-    last: boolean;
-  };
+  options?: Partial<
+    EventOptions & {
+      async: boolean;
+      lead: boolean;
+      last: boolean;
+      detach: boolean;
+    }
+  >;
   ctx: {
     running: boolean;
   };

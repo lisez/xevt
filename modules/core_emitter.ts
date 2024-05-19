@@ -31,7 +31,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     signature: EventHandlerSignature<any>,
   ): void {
     if (
-      signature.options.async &&
+      signature.options?.async &&
       // @ts-ignore TS7053
       ((signature.handler[Symbol.toStringTag] !== "AsyncFunction") &&
         !("then" in signature.handler))
@@ -39,7 +39,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
       throw new Error("Async handler must be a promise or thenable");
     }
     if (
-      signature.options.last && !signature.options.signal
+      signature.options?.last && !signature.options.signal
     ) {
       throw new Error("Last handler must have an abort signal");
     }

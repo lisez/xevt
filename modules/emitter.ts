@@ -16,9 +16,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       options: {
         once: options?.once || false,
         signal: options?.signal || new AbortController(),
-        async: false,
-        lead: false,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -40,9 +37,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       options: {
         once: options?.once || false,
         signal: options?.signal || null,
-        async: false,
         lead: true,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -60,8 +55,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       options: {
         once: options?.once || false,
         signal: options?.signal || null,
-        async: false,
-        lead: false,
         last: true,
       },
       ctx: { running: false },
@@ -81,8 +74,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
         once: options?.once || false,
         signal: options?.signal || null,
         async: true,
-        lead: false,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -102,7 +93,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
         signal: options?.signal || null,
         async: true,
         lead: true,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -121,7 +111,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
         once: options?.once || false,
         signal: options?.signal || null,
         async: true,
-        lead: false,
         last: true,
       },
       ctx: { running: false },

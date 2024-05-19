@@ -60,8 +60,7 @@ export class ContextExecutor<
 
   private *getContext() {
     while (this.queue.length) {
-      const ctx = this.queue.pop() || null;
-      yield ctx;
+      yield (this.queue.pop() || null);
     }
   }
 
@@ -73,11 +72,11 @@ export class ContextExecutor<
       this.current = executor;
 
       while (!executor.done) {
-        if (executor.value.options.once) {
+        if (executor.value.options?.once) {
           this.unregister(ctx.name, executor.value.handler);
         }
 
-        if (executor.value.options.lead) {
+        if (executor.value.options?.lead) {
           this.useFirst(ctx);
         }
 

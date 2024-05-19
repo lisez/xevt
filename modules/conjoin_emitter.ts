@@ -60,9 +60,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       options: {
         once: options?.once || false,
         signal: options?.signal || null,
-        async: false,
-        lead: false,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -88,9 +85,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       options: {
         once: options?.once || false,
         signal: options?.signal || null,
-        async: false,
         lead: true,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -108,8 +103,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       options: {
         once: options?.once || false,
         signal: options?.signal || null,
-        async: false,
-        lead: false,
         last: true,
       },
       ctx: { running: false },
@@ -129,8 +122,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         once: options?.once || false,
         signal: options?.signal || null,
         async: true,
-        lead: false,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -150,7 +141,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         signal: options?.signal || null,
         async: true,
         lead: true,
-        last: false,
       },
       ctx: { running: false },
     };
@@ -169,7 +159,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         once: options?.once || false,
         signal: options?.signal || null,
         async: true,
-        lead: false,
         last: true,
       },
       ctx: { running: false },

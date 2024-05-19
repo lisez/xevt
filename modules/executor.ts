@@ -52,7 +52,7 @@ export class Executor<T = EventName> {
 
   suspend() {
     this.counter++;
-    if (this.running) this.value.options.signal?.abort();
+    if (this.running) this.value.options?.signal?.abort();
   }
 
   block(handlers: EventHandler[]) {
@@ -73,7 +73,7 @@ export class Executor<T = EventName> {
     }
 
     const profile = this.value;
-    if (profile.options.async && this.thenable) {
+    if (profile.options?.async && this.thenable) {
       return this.execAsync(profile);
     }
     return this.exec(profile);
