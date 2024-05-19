@@ -10,8 +10,9 @@ export type ContextProfileOptions = {
 };
 
 export class ContextProfile<T = EventName> implements ExecutingContext<T> {
-  private hasFirst?: boolean;
   private hasLast?: boolean;
+  id = Math.random();
+  id2 = +Date.now();
 
   constructor(
     public readonly name: T,
@@ -23,23 +24,6 @@ export class ContextProfile<T = EventName> implements ExecutingContext<T> {
     this.args = args;
     this.signatures = signatures;
     this.options = options;
-  }
-
-  get running(): boolean {
-    return !!this.signatures.length &&
-      this.signatures.some((s) => s.ctx.running);
-  }
-
-  get useFirst(): boolean {
-    this.hasFirst ??= this.hasFirst ||
-      this.signatures.some((s) => !!s.options?.lead);
-    return this.hasFirst;
-  }
-
-  useFirstHandlers() {
-    return this.signatures.filter((s) => !!s.options?.lead).map((s) =>
-      s.handler
-    );
   }
 
   get useLast(): boolean {

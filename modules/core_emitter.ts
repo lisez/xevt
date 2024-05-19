@@ -8,14 +8,28 @@ import type {
 import type { ContextProfile } from "./context_profile.ts";
 
 import { ContextExecutor } from "./context_executor.ts";
+import * as helpers from "./helpers.ts";
+
+export type CoreEmitterOptions = {
+  manuallyFlush: boolean;
+  sharedQueue: ContextProfile<any>[];
+};
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
   protected executor: ContextExecutor<T, any>;
 
-  constructor(map?: RegisteredHandlers, queue?: ContextProfile<any>[]) {
-    this.handlers = map || new Map();
-    this.executor = new ContextExecutor(this.off.bind(this), queue);
+  constructor(
+    handlers?: RegisteredHandlers,
+    executor?: ContextExecutor<T, any>,
+    protected options?: Partial<CoreEmitterOptions>,
+  ) {
+    this.options = options || { manuallyFlush: false };
+    this.handlers = handlers || new Map();
+    this.executor = executor ||
+      new ContextExecutor(this.options?.sharedQueue || []);
+
+    this.executor.unregister ??= this.off.bind(this);
   }
 
   delay: number = 4;
@@ -53,7 +67,8 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
       // @ts-ignore TS2304
       requestAnimationFrame(callback);
     } else {
-      setTimeout(callback, this.delay);
+      const timer = setTimeout(() => callback(), this.delay);
+      if (timer) helpers.prexitClear(timer);
     }
   }
 

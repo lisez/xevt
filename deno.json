@@ -1,11 +1,17 @@
 {
+  "name": "xevt",
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch main.ts",
+    "test": "deno test --parallel --coverage=.coverage",
+    "test:html": "deno task test && deno coverage .coverage --html"
   },
   "lint": {
     "rules": {
       "exclude": ["no-explicit-any"]
     }
+  },
+  "imports": {
+    "modules/": "./modules/"
   },
   "exports": {
     "./conjoin_emitter": "./modules/conjoin_emitter.ts",

@@ -106,7 +106,7 @@ export class Executor<T = EventName> {
     }
   }
 
-  block(handlers: EventHandler[]) {
+  block(handlers: EventHandler[], keepCurrent = true) {
     for (const h of handlers) {
       let index = this.signatures.findIndex((s) => s.handler === h);
       while (index > -1) {
@@ -115,13 +115,13 @@ export class Executor<T = EventName> {
             this.signatures[index].options?.signal?.abort() ||
               this.signatures[index].ctx.cancel?.();
           }
-          index = this.signatures.findIndex((s, i) =>
-            s.handler === h && i > index
-          );
-        } else {
+        } else if (index !== this.counter || !keepCurrent) {
           this.signatures.splice(index, 1);
-          index = this.signatures.findIndex((s) => s.handler === h);
         }
+
+        index = this.signatures.findIndex((s, i) =>
+          s.handler === h && i > index
+        );
       }
     }
   }

@@ -1,4 +1,8 @@
-import type { EventName, UnregisterHandler } from "./types.ts";
+import type {
+  EventHandlerSignature,
+  EventName,
+  UnregisterHandler,
+} from "./types.ts";
 
 import { Executor } from "./executor.ts";
 import { ContextProfile } from "./context_profile.ts";
@@ -8,14 +12,12 @@ export class ContextExecutor<
   T extends ContextProfile<N> = ContextProfile<N>,
 > {
   private queue: T[];
-  private unregister: UnregisterHandler<N>;
   private current: Executor<N> | null = null;
+  public unregister: UnregisterHandler<N> | null = null;
 
   constructor(
-    unregister: UnregisterHandler<N>,
     queue?: T[],
   ) {
-    this.unregister = unregister;
     this.queue = queue || [];
   }
 
@@ -46,29 +48,26 @@ export class ContextExecutor<
     }
   }
 
-  private useFirst(ctx: T) {
+  private useFirst(ctx: T, signature: EventHandlerSignature<any>) {
     for (const p of this.queue) {
       if (p.name === ctx.name) {
-        const targetHandlers = p.useFirstHandlers();
-        p.removeHandlers(targetHandlers);
+        p.removeHandlers([signature.handler]);
       }
     }
 
-    if (this.current && ctx.name === this.current.name) {
-      const targetHandlers = ctx.useFirstHandlers();
-      this.current.block(targetHandlers);
-    }
+    this.current!.block([signature.handler]);
   }
 
   private launchExecutor(ctx: T, executor: Executor<N>) {
     this.current = executor;
 
     if (executor.value.options?.once) {
-      this.unregister(ctx.name, executor.value.handler);
+      this.unregister!(ctx.name, executor.value.handler);
+      this.useFirst(ctx, executor.value);
     }
 
     if (executor.value.options?.lead) {
-      this.useFirst(ctx);
+      this.useFirst(ctx, executor.value);
     }
 
     executor.next();
@@ -102,6 +101,10 @@ export class ContextExecutor<
   }
 
   exec() {
+    if (!this.unregister) {
+      throw new Error("Unregister handler is not set");
+    }
+
     const pendingQueue: [T, Executor<N>[]][] = [];
     let ctx = this.queue.pop();
     while (ctx) {

@@ -217,7 +217,9 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   }
 
   flush() {
-    this.delayExec(() => this.executor.exec());
+    if (!this.options?.manuallyFlush) {
+      this.delayExec(() => this.executor.exec());
+    }
   }
 
   off(

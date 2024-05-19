@@ -129,7 +129,9 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   }
 
   flush(): void {
-    this.delayExec(() => this.executor.exec());
+    if (!this.options?.manuallyFlush) {
+      this.delayExec(() => this.executor.exec());
+    }
   }
 
   off(event: EventName, handler?: EventHandler): void {

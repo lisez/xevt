@@ -13,6 +13,7 @@ import { isConjoinEvents } from "./helpers.ts";
 import { ConjoinEmitter } from "./conjoin_emitter.ts";
 import { Emitter } from "./emitter.ts";
 import { ContextProfile } from "./context_profile.ts";
+import { ContextExecutor } from "modules/context_executor.ts";
 
 export type XeventName = EventName | ConjoinEvents;
 
@@ -22,10 +23,18 @@ export class Xemitter extends CoreEmitter<XeventName>
   private conjoinEmitter: ConjoinEmitter;
 
   constructor(map?: RegisteredHandlers, queue: ContextProfile<any>[] = []) {
-    super(map, queue);
+    const options = { manuallyFlush: true };
+    const executor = new ContextExecutor<any>(queue);
+    super(map, executor, options);
 
-    this.emitter = new Emitter(this.handlers, queue);
-    this.conjoinEmitter = new ConjoinEmitter(this.handlers, queue);
+    this.emitter = new Emitter(this.handlers, executor, options);
+    this.conjoinEmitter = new ConjoinEmitter(
+      this.handlers,
+      executor,
+      options,
+    );
+
+    this.executor.unregister = this.off.bind(this);
   }
 
   on(
@@ -45,58 +54,58 @@ export class Xemitter extends CoreEmitter<XeventName>
   }
 
   get lead() {
-    return this.emitter.lead;
+    return this.emitter.lead.bind(this.emitter);
   }
 
   get last() {
-    return this.emitter.last;
+    return this.emitter.last.bind(this.emitter);
   }
 
   get leadAsync() {
-    return this.emitter.leadAsync;
+    return this.emitter.leadAsync.bind(this.emitter);
   }
 
   get lastAsync() {
-    return this.emitter.lastAsync;
+    return this.emitter.lastAsync.bind(this.emitter);
   }
 
   get onAsync() {
-    return this.emitter.onAsync;
+    return this.emitter.onAsync.bind(this.emitter);
   }
 
   get conjoin() {
-    return this.removeEventListener;
+    return this.conjoinEmitter.conjoin.bind(this.conjoinEmitter);
   }
 
   get conjoinFirst() {
-    return this.conjoinEmitter.conjoinFirst;
+    return this.conjoinEmitter.conjoinFirst.bind(this.conjoinEmitter);
   }
 
   get conjoinLast() {
-    return this.conjoinEmitter.conjoinLast;
+    return this.conjoinEmitter.conjoinLast.bind(this.conjoinEmitter);
   }
 
   get conjoinAsync() {
-    return this.conjoinEmitter.conjoinAsync;
+    return this.conjoinEmitter.conjoinAsync.bind(this.conjoinEmitter);
   }
 
   get conjoinFirstAsync() {
-    return this.conjoinEmitter.conjoinFirstAsync;
+    return this.conjoinEmitter.conjoinFirstAsync.bind(this.conjoinEmitter);
   }
 
   get conjoinLastAsync() {
-    return this.conjoinEmitter.conjoinLastAsync;
+    return this.conjoinEmitter.conjoinLastAsync.bind(this.conjoinEmitter);
   }
 
   emit(event: EventName, ...args: any[]): void {
     this.emitter.emit(event, ...args);
-    this.delayExec(() => this.executor.exec());
-    this.delayExec(() => this.conjoinEmitter.emit(event));
-    this.delayExec(() => this.executor.exec());
+    this.flush();
+    this.conjoinEmitter.emit(event);
+    this.flush();
   }
 
   flush(): void {
-    // INFO: use custom emit order in xemitter.
+    this.delayExec(() => this.executor.exec());
   }
 
   off(event: XeventName, handler?: EventHandler): void {
