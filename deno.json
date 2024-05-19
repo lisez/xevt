@@ -6,5 +6,16 @@
     "rules": {
       "exclude": ["no-explicit-any"]
     }
+  },
+  "exports": {
+    "./conjoin_emitter": "./modules/conjoin_emitter.ts",
+    "./context_executor": "./modules/context_executor.ts",
+    "./context_profile": "./modules/context_profile.ts",
+    "./executor": "./modules/executor.ts",
+    "./emitter": "./modules/emitter.ts",
+    "./helpers": "./modules/helpers.ts",
+    "./xemitter": "./modules/xemitter.ts",
+    "./core_emitter": "./modules/core_emitter.ts",
+    "./types": "./modules/types.ts"
   }
 }
