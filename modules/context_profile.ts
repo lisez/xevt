@@ -55,8 +55,17 @@ export class ContextProfile<T = EventName> implements ExecutingContext<T> {
   }
 
   removeHandlers(handlers: EventHandler[]) {
-    this.signatures = this.signatures.filter((s) =>
-      !handlers.includes(s.handler)
-    );
+    for (const h of handlers) {
+      let index = this.signatures.findIndex((s) => s.handler === h);
+      while (index > -1) {
+        if (this.signatures[index].ctx.running) {
+          this.signatures[index].options?.signal?.abort() ||
+            this.signatures[index].ctx.cancel?.();
+        }
+
+        this.signatures.splice(index, 1);
+        index = this.signatures.findIndex((s) => s.handler === h);
+      }
+    }
   }
 }

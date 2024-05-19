@@ -38,11 +38,6 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     ) {
       throw new Error("Async handler must be a promise or thenable");
     }
-    if (
-      signature.options?.last && !signature.options.signal
-    ) {
-      throw new Error("Last handler must have an abort signal");
-    }
 
     const handlers = this.handlers.get(name);
     if (handlers) {

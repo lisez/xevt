@@ -22,7 +22,7 @@ export type EventHandlerSignature<T> = {
   >;
   ctx: {
     running: boolean;
-    counter?: number;
+    cancel?: () => void;
   };
 };
 

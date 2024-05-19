@@ -2,10 +2,10 @@ import { Xemitter } from "../modules/xemitter.ts";
 
 const emitter1 = new Xemitter();
 
-emitter1.leadAsync("test", async (args) => {
+emitter1.lastAsync("test", async (args) => {
   console.log("event test +", JSON.stringify(args));
-  await new Promise((r) => setTimeout(r, 20000));
-}, { signal: new AbortController(), detach: true });
+  await new Promise((r) => setTimeout(r, 2000));
+}, { detach: true });
 
 emitter1.on("test1", (args) => {
   console.log("event test1", JSON.stringify(args));

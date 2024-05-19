@@ -9,6 +9,8 @@ export type ExecutorOptions = {
   start: number;
 };
 
+export class ExecutingCancelled extends Error {}
+
 export class Executor<T = EventName> {
   private counter = 0;
   pendingQueue: Executor<T>[] = [];
@@ -61,10 +63,14 @@ export class Executor<T = EventName> {
   private makeAsyncExec(profile: EventHandlerSignature<any>) {
     profile.ctx.running = true;
 
-    return Promise.resolve(
-      profile.handler(...this.args),
-    ).then(() => {
-      profile.ctx.running = false;
+    return new Promise((res, rej) => {
+      profile.ctx.cancel = () => {
+        rej(new ExecutingCancelled());
+      };
+      profile.handler(...this.args).then(res).catch(rej);
+    }).catch((err) => {
+      if (err instanceof ExecutingCancelled) return;
+      throw err;
     }).finally(() => {
       profile.ctx.running = false;
     });
@@ -95,15 +101,29 @@ export class Executor<T = EventName> {
   }
 
   suspend() {
-    this.counter++;
-    if (this.running) this.value.options?.signal?.abort();
+    if (this.running) {
+      this.value.options?.signal?.abort() || this.value.ctx.cancel?.();
+    }
   }
 
   block(handlers: EventHandler[]) {
-    // @ts-ignore TS2540 Allow internal changes
-    this.signatures = this.signatures.filter((s, i) =>
-      !handlers.includes(s.handler, i + 1)
-    );
+    for (const h of handlers) {
+      let index = this.signatures.findIndex((s) => s.handler === h);
+      while (index > -1) {
+        if (index < this.counter) {
+          if (this.signatures[index].ctx.running) {
+            this.signatures[index].options?.signal?.abort() ||
+              this.signatures[index].ctx.cancel?.();
+          }
+          index = this.signatures.findIndex((s, i) =>
+            s.handler === h && i > index
+          );
+        } else {
+          this.signatures.splice(index, 1);
+          index = this.signatures.findIndex((s) => s.handler === h);
+        }
+      }
+    }
   }
 
   next():

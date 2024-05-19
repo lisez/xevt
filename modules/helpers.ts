@@ -5,4 +5,3 @@ export function isConjoinEvents(
 ): event is ConjoinEvents {
   return Array.isArray(event) && event.length > 1;
 }
-
