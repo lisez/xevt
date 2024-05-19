@@ -5,21 +5,29 @@ import type {
   ExecutingContext,
 } from "./types.ts";
 
+export type ContextProfileOptions = {
+  start: number;
+};
+
 export class ContextProfile<T = EventName> implements ExecutingContext<T> {
-  public readonly name: T;
-  public readonly args: any[];
-  public signatures: EventHandlerSignature<T>[];
   private hasFirst?: boolean;
   private hasLast?: boolean;
 
-  constructor(name: T, args: any[], signatures: EventHandlerSignature<T>[]) {
+  constructor(
+    public readonly name: T,
+    public readonly args: any[],
+    public signatures: EventHandlerSignature<T>[],
+    public options?: Partial<ContextProfileOptions>,
+  ) {
     this.name = name;
     this.args = args;
     this.signatures = signatures;
+    this.options = options;
   }
 
   get running(): boolean {
-    return this.signatures.some((s) => s.ctx.running);
+    return !!this.signatures.length &&
+      this.signatures.some((s) => s.ctx.running);
   }
 
   get useFirst(): boolean {

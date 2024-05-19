@@ -15,9 +15,9 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || new AbortController(),
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
@@ -36,10 +36,10 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         lead: true,
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
@@ -54,10 +54,10 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         last: true,
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
@@ -72,10 +72,10 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
@@ -90,11 +90,11 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
         lead: true,
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
@@ -109,17 +109,20 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
         last: true,
       },
-      ctx: { running: false },
     };
     this.onBySignature(event, signature);
   }
 
   emit(event: EventName, ...args: any[]): void {
-    const handlers = this.handlers.get(event) || [];
+    const handlers = (this.handlers.get(event)?.slice() || []).map((p) => ({
+      ...p,
+      ctx: { running: false },
+    }));
     const profile = new ContextProfile(event, args, handlers);
     this.executor.emit(profile);
     this.delayExec(() => this.flush());

@@ -20,7 +20,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   private idleQueue: PendingConjoinEvent[] = [];
 
   private internalConjoinOn(
-    signature: EventHandlerSignature<ConjoinEvents>,
+    signature: Omit<EventHandlerSignature<ConjoinEvents>, "ctx">,
   ) {
     if (signature.name.length < 2) {
       throw new RangeError("Conjoin events must have at least two events");
@@ -59,9 +59,9 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -84,10 +84,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         lead: true,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -102,10 +102,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         last: true,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -120,10 +120,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -138,11 +138,11 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
         lead: true,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -157,11 +157,11 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once || false,
+        detach: options?.detach || false,
         signal: options?.signal || null,
         async: true,
         last: true,
       },
-      ctx: { running: false },
     };
     this.internalConjoinOn(signature);
   }
@@ -196,7 +196,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     for (const queue of [this.waitingQueue, this.idleQueue]) {
       const { fulfill, idle } = this.scan(event, queue);
       for (const f of fulfill) {
-        const handlers = this.handlers.get(f) || [];
+        const handlers = (this.handlers.get(f)?.slice() || []).map((p) => ({
+          ...p,
+          ctx: { running: false },
+        }));
         const profile = new ContextProfile(f, [], handlers);
         this.executor.emit(profile);
         this.delayExec(() => this.flush());

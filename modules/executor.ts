@@ -4,21 +4,34 @@ import type {
   EventName,
 } from "./types.ts";
 
+export type ExecutorOptions = {
+  disableDetach: boolean;
+  start: number;
+};
+
 export class Executor<T = EventName> {
   private counter = 0;
+  pendingQueue: Executor<T>[] = [];
 
   constructor(
     public readonly name: T,
-    private signatures: EventHandlerSignature<any>[],
-    private readonly args: any[] = [],
+    public readonly signatures: EventHandlerSignature<any>[],
+    public readonly args: any[] = [],
+    private options: Partial<ExecutorOptions> = {},
   ) {
     this.name = name;
     this.signatures = signatures;
     this.args = args;
+    this.options = options;
+    this.counter = options.start || 0;
   }
 
-  get done() {
-    return this.counter >= this.signatures.length;
+  get pointer() {
+    return this.counter;
+  }
+
+  get done(): boolean {
+    return this.counter >= this.signatures.length && !this.running;
   }
 
   get value() {
@@ -26,28 +39,59 @@ export class Executor<T = EventName> {
   }
 
   get thenable() {
-    return "then" in this.value.handler &&
-      typeof this.value.handler === "function";
+    // @ts-ignore TS7053
+    return this.value.handler[Symbol.toStringTag] === "AsyncFunction" ||
+      ("then" in this.value.handler &&
+        typeof this.value.handler === "function");
   }
 
   get running() {
-    return this.value.ctx.running;
+    return !!this.value?.ctx?.running;
   }
 
   private exec(profile: EventHandlerSignature<any>) {
+    this.counter++;
     profile.ctx.running = true;
     profile.handler(...this.args);
     profile.ctx.running = false;
-    this.counter++;
+    if (this.done) return this.return();
     return { value: profile, done: false as const };
   }
 
-  private async execAsync(profile: EventHandlerSignature<any>) {
+  private makeAsyncExec(profile: EventHandlerSignature<any>) {
     profile.ctx.running = true;
-    await (profile.handler(...this.args) as unknown as Promise<void>);
-    profile.ctx.running = false;
+
+    return Promise.resolve(
+      profile.handler(...this.args),
+    ).then(() => {
+      profile.ctx.running = false;
+    }).finally(() => {
+      profile.ctx.running = false;
+    });
+  }
+
+  private async execAsync(profile: EventHandlerSignature<any>) {
     this.counter++;
+    await this.makeAsyncExec(profile);
+    if (this.done) return this.return();
     return { value: profile, done: false as const };
+  }
+
+  private execDetached(profile: EventHandlerSignature<any>) {
+    this.counter++;
+    this.detachProfile(profile);
+    if (this.done) return this.return();
+    return { value: profile, done: false as const };
+  }
+
+  private detachProfile(profile: EventHandlerSignature<any>) {
+    const index = this.signatures.indexOf(profile);
+    if (index > -1) {
+      this.signatures.splice(index, 1);
+    }
+    this.pendingQueue.push(
+      new Executor(profile.name, [profile], this.args, { disableDetach: true }),
+    );
   }
 
   suspend() {
@@ -56,6 +100,7 @@ export class Executor<T = EventName> {
   }
 
   block(handlers: EventHandler[]) {
+    // @ts-ignore TS2540 Allow internal changes
     this.signatures = this.signatures.filter((s, i) =>
       !handlers.includes(s.handler, i + 1)
     );
@@ -67,14 +112,15 @@ export class Executor<T = EventName> {
     if (this.done) {
       return this.return();
     }
-
     if (this.running) {
       return { value: this.value, done: false as const };
     }
 
     const profile = this.value;
     if (profile.options?.async && this.thenable) {
-      return this.execAsync(profile);
+      return !this.options.disableDetach && profile.options.detach
+        ? this.execDetached(profile)
+        : this.execAsync(profile);
     }
     return this.exec(profile);
   }

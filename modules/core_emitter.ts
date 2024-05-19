@@ -15,7 +15,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   constructor(map?: RegisteredHandlers, queue?: ContextProfile<any>[]) {
     this.handlers = map || new Map();
-    this.executor = new ContextExecutor(this.off, queue);
+    this.executor = new ContextExecutor(this.off.bind(this), queue);
   }
 
   delay: number = 4;
@@ -28,7 +28,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   protected onBySignature(
     name: EventName,
-    signature: EventHandlerSignature<any>,
+    signature: Omit<EventHandlerSignature<any>, "ctx">,
   ): void {
     if (
       signature.options?.async &&

@@ -6,6 +6,7 @@ export type EventHandler = (...args: any[]) => any;
 
 export type EventOptions = {
   once: boolean;
+  detach: boolean;
   signal: AbortController | null;
 };
 
@@ -17,11 +18,11 @@ export type EventHandlerSignature<T> = {
       async: boolean;
       lead: boolean;
       last: boolean;
-      detach: boolean;
     }
   >;
   ctx: {
     running: boolean;
+    counter?: number;
   };
 };
 
@@ -39,7 +40,7 @@ export type ConjoinEventsRegister = (
 
 export type RegisteredHandlers = Map<
   EventName,
-  EventHandlerSignature<EventName>[]
+  Omit<EventHandlerSignature<EventName>, "ctx">[]
 >;
 
 export type EventRegisterName = "on" | "lead" | "last";

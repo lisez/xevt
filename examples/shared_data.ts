@@ -8,9 +8,9 @@ const sharedQueue: any[] = [];
 const emitter1 = new Emitter(sharedHandlers, sharedQueue);
 const emitter2 = new ConjoinEmitter(sharedHandlers, sharedQueue);
 
-emitter1.on("test", async (args) => {
-  console.log("event test", JSON.stringify(args));
-}, { signal: new AbortController() });
+emitter1.lastAsync("test", async (args) => {
+  console.log("event test +", JSON.stringify(args));
+}, { signal: new AbortController(), detach: true });
 
 emitter1.on("test1", () => {
   console.log("event test1");
@@ -18,7 +18,7 @@ emitter1.on("test1", () => {
 
 emitter2.on(["test", "test1"], () => {
   console.log("event test and test1");
-});
+}, { once: true });
 
 emitter1.emit("test", 1);
 emitter1.emit("test", 2);
@@ -32,11 +32,11 @@ await new Promise((r) =>
   setTimeout(() => {
     emitter1.emit("test", 14);
     r(true);
-  }, 1)
+  }, 15)
 );
 await new Promise((r) =>
   setTimeout(() => {
-    emitter1.emit("test", 145);
+    emitter1.emit("test", 15);
     r(true);
   }, 10)
 );
