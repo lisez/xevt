@@ -125,11 +125,11 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
     }));
     const profile = new ContextProfile(event, args, handlers);
     this.executor.emit(profile);
-    this.delayExec(() => this.flush());
+    this.flush();
   }
 
   flush(): void {
-    this.executor.exec();
+    this.delayExec(() => this.executor.exec());
   }
 
   off(event: EventName, handler?: EventHandler): void {

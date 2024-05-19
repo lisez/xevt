@@ -41,7 +41,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     this.onBySignature(name, signature);
   }
 
-  private getConjoinedEventName(
+  getConjoinedEventName(
     events: EventName[] | ConjoinEvents,
   ): EventName {
     const keys = ([] as EventName[]).concat(events);
@@ -202,7 +202,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         }));
         const profile = new ContextProfile(f, [], handlers);
         this.executor.emit(profile);
-        this.delayExec(() => this.flush());
+        this.flush();
       }
 
       nextWaiting = nextWaiting.concat(fulfill);
@@ -217,7 +217,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   }
 
   flush() {
-    this.executor.exec();
+    this.delayExec(() => this.executor.exec());
   }
 
   off(
