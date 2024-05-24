@@ -1,15 +1,15 @@
 import { assert, assertEquals } from "jsr:@std/assert";
 import { describe, it } from "jsr:@std/testing/bdd";
 
-import { Xemitter } from "modules/xemitter.ts";
+import { Xevt } from "modules/xevt.ts";
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe("Xemitter - multiple events", () => {
+describe("Xevt - multiple events", () => {
   it("should listen multiple events", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
 
     let count = 0;
     emitter.on(["event1", "event2"], () => {
@@ -24,7 +24,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should listen multiple handlers", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     const result: number[] = [];
     emitter.on(["event1", "event2"], () => {
       result.push(1);
@@ -41,7 +41,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should listen multiple async handlers", async () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     const result: number[] = [];
     emitter.conjoinAsync(["event1", "event2"], async () => {
       result.push(1);
@@ -58,7 +58,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should listen multiple events with addEventListener", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let count = 0;
     emitter.addEventListener(["event1", "event2"], () => {
       count++;
@@ -71,7 +71,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it('should listen multiple events with "conjoin"', () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let count = 0;
     emitter.conjoin(["event1", "event2"], () => {
       count++;
@@ -84,7 +84,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should remove multiple events", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let count = 0;
     const handler = () => {
       count++;
@@ -102,7 +102,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should listen multiple events once", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let count = 0;
     emitter.on(
       ["event1", "event2"],
@@ -119,14 +119,14 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("should take every async events", async () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let result: number = 0;
     emitter.conjoinAsync(["event1", "event2"], async () => {
       await new Promise((resolve) =>
         setTimeout(() => {
           result++;
           resolve(true);
-        }, 10),
+        }, 10)
       );
     });
     emitter.emit("event1");
@@ -142,7 +142,7 @@ describe("Xemitter - multiple events", () => {
   });
 
   it("mix handlers", async () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     const result: number[] = [];
     emitter.conjoin(["event1", "event2"], () => {
       result.push(1);

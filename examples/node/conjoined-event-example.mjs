@@ -1,6 +1,6 @@
-import { Xemitter } from "xevt";
+import { Xevt } from "xevt";
 
-const emitter = new Xemitter();
+const emitter = new Xevt();
 emitter.on("event1", (data) => {
   console.log("Event1:", data);
 });
