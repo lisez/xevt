@@ -1,5 +1,6 @@
 {
   "name": "xevt",
+  "version": "0.3.1",
   "tasks": {
     "dev": "deno run --watch main.ts",
     "test": "deno test --parallel --coverage=.coverage",
@@ -7,9 +8,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": [
-        "no-explicit-any"
-      ]
+      "exclude": ["no-explicit-any"]
     }
   },
   "imports": { "@deno/dnt": "jsr:@deno/dnt@^0.41.1", "modules/": "./modules/" },

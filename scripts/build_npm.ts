@@ -1,6 +1,6 @@
 import { build, emptyDir } from "@deno/dnt";
 
-const jsrInfo = await import("../jsr.json", { with: { type: "json" } }).then(
+const denoInfo = await import("../deno.json", { with: { type: "json" } }).then(
   (e) => e.default,
 );
 
@@ -27,7 +27,7 @@ await build({
   package: {
     // package.json properties
     name: "xevt",
-    version: jsrInfo.version,
+    version: denoInfo.version,
     description: "another event emiiter.",
     license: "MIT",
     repository: {
