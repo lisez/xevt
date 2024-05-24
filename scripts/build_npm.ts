@@ -12,7 +12,6 @@ await emptyDir(output);
 
 await build({
   test: false,
-  declaration: false,
   typeCheck: "both",
   entryPoints: ["./modules/xemitter.ts"],
   outDir: output,

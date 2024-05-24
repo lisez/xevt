@@ -11,6 +11,8 @@ import { CoreEmitter } from "./core_emitter.ts";
 export const EmitDone = Symbol("emit_done");
 
 export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
+  private prevEvents?: Promise<any>;
+
   on(event: EventName, handler: EventHandler, options?: Partial<EventOptions>) {
     const signature = {
       name: event,
@@ -46,14 +48,23 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
     this.on("error", handler);
   }
 
-  emit(event: EventName, ...args: any[]): void {
+  emit(event: EventName, ...args: any[]): any {
     const handlers = this.handlers.get(event)?.slice() || [];
-    handlers.filter((e) => e.options?.once).forEach((e) => {
-      this.offByHandler(event, e.handler);
-    });
+    handlers
+      .filter((e) => e.options?.once)
+      .forEach((e) => {
+        this.offByHandler(event, e.handler);
+      });
 
     try {
-      this.internalExec(0, handlers, ...args);
+      if (this.prevEvents) {
+        this.prevEvents = this.prevEvents.then(() =>
+          this.internalExec(0, handlers, ...args),
+        );
+      } else {
+        this.prevEvents = this.internalExec(0, handlers, ...args);
+      }
+      return this.prevEvents;
     } catch (err) {
       this.emit("error", err);
     } finally {
