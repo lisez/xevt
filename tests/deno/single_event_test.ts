@@ -124,7 +124,7 @@ describe("Xemitter - single event", () => {
     );
 
     for (let i = 0; i < 5; i++) {
-      await emitter.emit("event", i);
+      emitter.emit("event", i);
     }
     await delay(100);
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);

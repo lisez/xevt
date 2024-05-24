@@ -144,7 +144,7 @@ describe("Xemitter - multiple events", () => {
   it("mix handlers", async () => {
     const emitter = new Xemitter();
     const result: number[] = [];
-    emitter.conjoin(["event1", "event2"], async () => {
+    emitter.conjoin(["event1", "event2"], () => {
       result.push(1);
     });
     emitter.conjoinAsync(["event1", "event2"], async () => {
