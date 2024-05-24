@@ -4,10 +4,10 @@ export type ConjoinEvents = [EventName, EventName, ...EventName[]];
 
 export type EventHandler = (...args: any[]) => any;
 
+export type ErrorHandler = (error: unknown) => void;
+
 export type EventOptions = {
   once: boolean;
-  detach: boolean;
-  signal: AbortController | null;
 };
 
 export type EventHandlerSignature<T> = {
@@ -16,14 +16,8 @@ export type EventHandlerSignature<T> = {
   options?: Partial<
     EventOptions & {
       async: boolean;
-      lead: boolean;
-      last: boolean;
     }
   >;
-  ctx: {
-    running: boolean;
-    cancel?: () => void;
-  };
 };
 
 export type EventRegister = (
@@ -40,15 +34,12 @@ export type ConjoinEventsRegister = (
 
 export type RegisteredHandlers = Map<
   EventName,
-  Omit<EventHandlerSignature<EventName>, "ctx">[]
+  EventHandlerSignature<EventName>[]
 >;
 
-export type EventRegisterName = "on" | "lead" | "last";
+export type EventRegisterName = "on";
 
-export type ConjoinEventsRegisterName =
-  | "conjoin"
-  | "conjoinFirst"
-  | "conjoinLast";
+export type ConjoinEventsRegisterName = "conjoin";
 
 export type UnregisterHandler<T> = (
   event: T,
@@ -64,9 +55,7 @@ export type XCoreEmitter<T> =
   & {
     eventNames(): EventName[];
     emit(event: EventName, ...args: any[]): void;
-    delay: number;
-    delayExec(callback: (...args: any[]) => void): void;
-    flush(): void;
+    error(handler: ErrorHandler): void;
   }
   & EventUnregister<T>;
 

@@ -8,7 +8,7 @@ function delay(ms: number) {
 }
 
 describe("Xemitter - multiple events", () => {
-  it("should listen multiple events", async () => {
+  it("should listen multiple events", () => {
     const emitter = new Xemitter();
 
     let count = 0;
@@ -20,12 +20,10 @@ describe("Xemitter - multiple events", () => {
     emitter.emit("event1");
     emitter.emit("event2");
 
-    await delay(emitter.delay * 2);
     assert(count === 2, `Expected 2, got ${count}`);
-    await delay(100);
   });
 
-  it("should listen multiple events with addEventListener", async () => {
+  it("should listen multiple events with addEventListener", () => {
     const emitter = new Xemitter();
     let count = 0;
     emitter.addEventListener(["event1", "event2"], () => {
@@ -35,12 +33,10 @@ describe("Xemitter - multiple events", () => {
     emitter.emit("event2");
     emitter.emit("event1");
     emitter.emit("event2");
-    await delay(emitter.delay * 2);
     assert(count === 2, `Expected 2, got ${count}`);
-    await delay(100);
   });
 
-  it('should listen multiple events with "conjoin"', async () => {
+  it('should listen multiple events with "conjoin"', () => {
     const emitter = new Xemitter();
     let count = 0;
     emitter.conjoin(["event1", "event2"], () => {
@@ -50,12 +46,10 @@ describe("Xemitter - multiple events", () => {
     emitter.emit("event2");
     emitter.emit("event1");
     emitter.emit("event2");
-    await delay(emitter.delay * 2);
     assert(count === 2, `Expected 2, got ${count}`);
-    await delay(100);
   });
 
-  it("should remove multiple events", async () => {
+  it("should remove multiple events", () => {
     const emitter = new Xemitter();
     let count = 0;
     const handler = () => {
@@ -70,12 +64,10 @@ describe("Xemitter - multiple events", () => {
     emitter.emit("event1");
     emitter.emit("event2");
 
-    await delay(100);
     assert(count === 1, `Expected 1, got ${count}`);
-    await delay(100);
   });
 
-  it("should listen multiple events once", async () => {
+  it("should listen multiple events once", () => {
     const emitter = new Xemitter();
     let count = 0;
     emitter.on(["event1", "event2"], () => {
@@ -85,47 +77,7 @@ describe("Xemitter - multiple events", () => {
     emitter.emit("event2");
     emitter.emit("event1");
     emitter.emit("event2");
-    await delay(emitter.delay);
     assert(count === 1, `Expected 1, got ${count}`);
-    await delay(100);
-  });
-
-  it("should take first event", async () => {
-    const emitter = new Xemitter();
-    let result: number = 0;
-    emitter.conjoinFirst(["event1", "event2"], () => {
-      result++;
-    });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(emitter.delay);
-    assertEquals(result, 1);
-    await delay(100);
-  });
-
-  it("should take last event", async () => {
-    const emitter = new Xemitter();
-    let result: number = 0;
-    emitter.conjoinLast(["event1", "event2"], () => {
-      result++;
-    });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(emitter.delay);
-    assertEquals(result, 1);
-    await delay(100);
   });
 
   it("should take every async events", async () => {
@@ -136,67 +88,18 @@ describe("Xemitter - multiple events", () => {
         setTimeout(() => {
           result++;
           resolve(true);
-        }, 100)
+        }, 10)
       );
     });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(1000);
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    await delay(100);
     assertEquals(result, 4);
-    await delay(100);
-  });
-
-  it("should take first event async", async () => {
-    const emitter = new Xemitter();
-    let result: number = 0;
-    emitter.conjoinFirstAsync(["event1", "event2"], async () => {
-      await new Promise((resolve) =>
-        setTimeout(() => {
-          result++;
-          resolve(true);
-        }, 100)
-      );
-    });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(200);
-    assertEquals(result, 1);
-    await delay(100);
-  });
-
-  it("should take last event async", async () => {
-    const emitter = new Xemitter();
-    let result: number = 0;
-    emitter.conjoinLastAsync(["event1", "event2"], async () => {
-      await new Promise((resolve) =>
-        setTimeout(() => {
-          result++;
-          resolve(true);
-        }, 100)
-      );
-    });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(200);
-    assertEquals(result, 1);
-    await delay(100);
   });
 });
