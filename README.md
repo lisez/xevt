@@ -50,6 +50,8 @@ await emitter.emit("event");
 
 ### Conjoined event
 
+IMPORTANT: conjoined events are not supported any arguments in handlers.
+
 ```typescript
 const emitter = new Xevt();
 
@@ -59,6 +61,8 @@ emitter.on(["event1", "event2"], () => {
 });
 emitter.emit("event1");
 emitter.emit("event2");
+
+console.log(count); // 1
 ```
 
 ### Mixed async/sync handlers
@@ -83,6 +87,8 @@ emitter.onAsync(
 for (let i = 0; i < 5; i++) {
   emitter.emit("event", i);
 }
+
+// [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
 ```typescript
@@ -99,4 +105,6 @@ for (let i = 0; i < 5; i++) {
   emitter.emit("event1");
   emitter.emit("event2");
 }
+
+// [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 ```
