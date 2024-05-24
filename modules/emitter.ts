@@ -1,4 +1,5 @@
 import type {
+  ErrorHandler,
   EventHandler,
   EventName,
   EventOptions,
@@ -6,7 +7,8 @@ import type {
 } from "./types.ts";
 
 import { CoreEmitter } from "./core_emitter.ts";
-import { ContextProfile } from "./context_profile.ts";
+
+export const EmitDone = Symbol("emit_done");
 
 export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   on(event: EventName, handler: EventHandler, options?: Partial<EventOptions>) {
@@ -14,9 +16,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       name: event,
       handler,
       options: {
-        once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || new AbortController(),
+        once: options?.once || event === EmitDone,
       },
     };
     this.onBySignature(event, signature);
@@ -24,42 +24,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
 
   get addEventListener() {
     return this.on;
-  }
-
-  lead(
-    event: EventName,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || null,
-        lead: true,
-      },
-    };
-    this.onBySignature(event, signature);
-  }
-
-  last(
-    event: EventName,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || null,
-        last: true,
-      },
-    };
-    this.onBySignature(event, signature);
   }
 
   onAsync(
@@ -72,65 +36,28 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || null,
         async: true,
       },
     };
     this.onBySignature(event, signature);
   }
 
-  leadAsync(
-    event: EventName,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || null,
-        async: true,
-        lead: true,
-      },
-    };
-    this.onBySignature(event, signature);
-  }
-
-  lastAsync(
-    event: EventName,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || false,
-        detach: options?.detach || false,
-        signal: options?.signal || null,
-        async: true,
-        last: true,
-      },
-    };
-    this.onBySignature(event, signature);
+  error(handler: ErrorHandler) {
+    this.on("error", handler);
   }
 
   emit(event: EventName, ...args: any[]): void {
-    const handlers = (this.handlers.get(event)?.slice() || []).map((p) => ({
-      ...p,
-      ctx: { running: false },
-    }));
-    const profile = new ContextProfile(event, args, handlers);
-    this.executor.emit(profile);
-    this.flush();
-  }
+    const handlers = this.handlers.get(event)?.slice() || [];
+    handlers.filter((e) => e.options?.once).forEach((e) => {
+      this.offByHandler(event, e.handler);
+    });
 
-  flush(): void {
-    if (!this.options?.manuallyFlush) {
-      this.delayExec(() => this.executor.exec());
+    try {
+      this.internalExec(0, handlers, ...args);
+    } catch (err) {
+      this.emit("error", err);
+    } finally {
+      if (event !== EmitDone) this.emit(EmitDone);
     }
   }
 
