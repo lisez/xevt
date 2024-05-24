@@ -12,18 +12,19 @@ import type {
 import { CoreEmitter } from "./core_emitter.ts";
 import { Emitter } from "./emitter.ts";
 
-export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
-  implements XConjoinEmitter {
+export class ConjoinEmitter
+  extends CoreEmitter<ConjoinEvents>
+  implements XConjoinEmitter
+{
   private nameIndex: Map<EventName, number> = new Map();
   private conjoinedNames: Map<EventName, ConjoinEvents> = new Map();
   private indexCounter = 0;
   private waitingQueue: PendingConjoinEvent[] = [];
   private idleQueue: PendingConjoinEvent[] = [];
   private errorEmitter = new Emitter();
+  private prevEvents?: Promise<any>;
 
-  private internalConjoinOn(
-    signature: EventHandlerSignature<ConjoinEvents>,
-  ) {
+  private internalConjoinOn(signature: EventHandlerSignature<ConjoinEvents>) {
     if (signature.name.length < 2) {
       throw new RangeError("Conjoin events must have at least two events");
     }
@@ -43,9 +44,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     this.onBySignature(name, signature);
   }
 
-  getConjoinedEventName(
-    events: EventName[] | ConjoinEvents,
-  ): EventName {
+  getConjoinedEventName(events: EventName[] | ConjoinEvents): EventName {
     const keys = ([] as EventName[]).concat(events);
     keys.sort();
     return keys.join(".");
@@ -120,29 +119,26 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     if (!event) return;
 
     const handlers = this.handlers.get(event)?.slice() || [];
-    handlers.filter((e) => e.options?.once).forEach((e) => {
-      this.offByHandler(event, e.handler);
-    });
-    const isSync = handlers.every((e) => !e.options?.async);
+    handlers
+      .filter((e) => e.options?.once)
+      .forEach((e) => {
+        this.offByHandler(event, e.handler);
+      });
+
     try {
       if (handlers.length) {
-        if (isSync) {
-          this.internalExec(0, handlers);
-          return this.exec(pointer + 1, events);
-        } else {
-          return this.internalExec(0, handlers).catch((err: unknown) => {
-            throw err;
-          }).then(() => {
-            return this.exec(pointer + 1, events);
-          });
+        const result = this.internalExec(0, handlers);
+        if (result) {
+          return result.then(() => this.exec(pointer + 1, events));
         }
+        return this.exec(pointer + 1, events);
       }
     } catch (e) {
       this.errorEmitter.emit("error", e);
     }
   }
 
-  emit(event: EventName): void {
+  emit(event: EventName): any {
     if (!this.nameIndex.has(event)) return;
 
     let executing: EventName[] = [];
@@ -154,19 +150,23 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       nextIdle = nextIdle.concat(idle);
     }
 
-    if (executing.length) this.exec(0, executing);
-
     this.idleQueue = nextIdle;
     this.waitingQueue = executing.map((e) => ({
       event: e,
       conjoined: this.conjoinedNames.get(e)?.slice() || [],
     }));
+
+    if (executing.length) {
+      if (this.prevEvents) {
+        this.prevEvents = this.prevEvents.then(() => this.exec(0, executing));
+      } else {
+        this.prevEvents = this.exec(0, executing);
+      }
+    }
+    return this.prevEvents;
   }
 
-  off(
-    event: ConjoinEvents,
-    handler?: EventHandler,
-  ): void {
+  off(event: ConjoinEvents, handler?: EventHandler): void {
     const key = this.getConjoinedEventName(event);
     if (handler) {
       return this.offByHandler(key, handler);
