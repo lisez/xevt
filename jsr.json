@@ -1,5 +1,6 @@
 {
   "name": "@lisez/xevt",
   "version": "0.3.0",
-  "exports": "./modules/xemitter.ts"
+  "exports": "./modules/xemitter.ts",
+  "exclude": ["node_modules", "dist", ".github", "examples", "tests"]
 }
