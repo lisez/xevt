@@ -15,7 +15,7 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.node-version }}
-      - run: deno test --parallel --coverage && deno coverage --lcov cov > cov.lcov
+      - run: deno test --parallel --coverage=.coverage && deno coverage .coverage --lcov cov > cov.lcov
       - name: Upload coverage to Coveralls.io
         uses: coverallsapp/github-action@master
         with:
