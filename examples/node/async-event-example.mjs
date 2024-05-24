@@ -1,6 +1,6 @@
-import { Xemitter } from "xevt";
+import { Xevt } from "xevt";
 
-const emitter = new Xemitter();
+const emitter = new Xevt();
 emitter.onAsync(
     "event",
     async (data) =>

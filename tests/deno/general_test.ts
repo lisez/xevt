@@ -1,10 +1,10 @@
 import { assert, assertEquals, assertIsError } from "jsr:@std/assert";
 import { describe, it } from "jsr:@std/testing/bdd";
 
-import { Xemitter } from "modules/xemitter.ts";
+import { Xevt } from "modules/xevt.ts";
 
 it("list all events", () => {
-  const emitter = new Xemitter();
+  const emitter = new Xevt();
   assertEquals(emitter.eventNames(), []);
 
   emitter.on("foo", () => {});
@@ -21,7 +21,7 @@ it("list all events", () => {
 });
 
 it("catch error", () => {
-  const emitter = new Xemitter();
+  const emitter = new Xevt();
   let count = 0;
   emitter.on("error", (error) => {
     assertIsError(error);
@@ -40,7 +40,7 @@ it("catch error", () => {
 });
 
 it("remove event handlers", () => {
-  const emitter = new Xemitter();
+  const emitter = new Xevt();
   let count = 0;
   const handler = () => {
     count += 1;
@@ -53,7 +53,7 @@ it("remove event handlers", () => {
 });
 
 it("remove conjoined event handlers", () => {
-  const emitter = new Xemitter();
+  const emitter = new Xevt();
   let count = 0;
   const handler = () => {
     count += 1;

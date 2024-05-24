@@ -19,7 +19,7 @@ npm install xevt
 Then:
 
 ```typescript
-import { Xemitter } from "xevt";
+import { Xevt } from "xevt";
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ import { Xemitter } from "xevt";
 ### Basic usage
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let result = 0;
 emitter.on("event", () => {
@@ -39,7 +39,7 @@ emitter.emit("event");
 ### Async event
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let result = 0;
 emitter.onAsync("event", async () => {
@@ -51,7 +51,7 @@ await emitter.emit("event");
 ### Conjoined event
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let count = 0;
 emitter.on(["event1", "event2"], () => {
@@ -64,7 +64,7 @@ emitter.emit("event2");
 ### Mixed async/sync handlers
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 const result: number[] = [];
 emitter.on("event", (data) => {
   result.push(data);
@@ -86,7 +86,7 @@ for (let i = 0; i < 5; i++) {
 ```
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 const result: number[] = [];
 emitter.conjoin(["event1", "event2"], async () => {
   result.push(1);
