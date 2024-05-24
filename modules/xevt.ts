@@ -16,7 +16,7 @@ import { EmitDone, Emitter } from "./emitter.ts";
 
 export type XeventName = EventName | ConjoinEvents;
 
-export class Xemitter extends CoreEmitter<XeventName>
+export class Xevt extends CoreEmitter<XeventName>
   implements XevtEmitter, XConjoinEmitter {
   private emitter: Emitter;
   private conjoinEmitter: ConjoinEmitter;

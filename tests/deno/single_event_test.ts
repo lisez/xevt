@@ -1,15 +1,15 @@
 import { assert, assertEquals } from "jsr:@std/assert";
 import { describe, it } from "jsr:@std/testing/bdd";
 
-import { Xemitter } from "modules/xemitter.ts";
+import { Xevt } from "modules/xevt.ts";
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe("Xemitter - single event", () => {
+describe("Xevt - single event", () => {
   it("should listen event", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
 
     let result = 0;
     emitter.on("event", () => {
@@ -21,7 +21,7 @@ describe("Xemitter - single event", () => {
   });
 
   it("should listen event multiple times", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
 
     let result = 0;
     emitter.on("event", () => {
@@ -33,7 +33,7 @@ describe("Xemitter - single event", () => {
   });
 
   it('should listen event with "addEventListener"', () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let result = 0;
     emitter.addEventListener("event", () => {
       result++;
@@ -43,7 +43,7 @@ describe("Xemitter - single event", () => {
   });
 
   it("should remove event", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let result = 0;
     const handler = () => {
       result++;
@@ -57,7 +57,7 @@ describe("Xemitter - single event", () => {
   });
 
   it("should listen event once", () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let count = 0;
     emitter.on(
       "event",
@@ -74,7 +74,7 @@ describe("Xemitter - single event", () => {
   });
 
   it('should listen event with "addEventListener"', () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     let result = 0;
     emitter.addEventListener("event", () => {
       result++;
@@ -84,14 +84,14 @@ describe("Xemitter - single event", () => {
   });
 
   it("should listen every async events", async () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     const result: number[] = [];
     emitter.onAsync("event", async (arg) => {
       await new Promise((resolve) =>
         setTimeout(() => {
           result.push(arg);
           resolve(true);
-        }, 10),
+        }, 10)
       );
     });
     emitter.emit("event", 1);
@@ -107,7 +107,7 @@ describe("Xemitter - single event", () => {
   });
 
   it("mix handlers", async () => {
-    const emitter = new Xemitter();
+    const emitter = new Xevt();
     const result: number[] = [];
     emitter.on("event", (data) => {
       result.push(data);

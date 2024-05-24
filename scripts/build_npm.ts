@@ -13,7 +13,7 @@ await emptyDir(output);
 await build({
   test: false,
   typeCheck: "both",
-  entryPoints: ["./modules/xemitter.ts"],
+  entryPoints: ["./modules/xevt.ts"],
   outDir: output,
   shims: {
     deno: false,

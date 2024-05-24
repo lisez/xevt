@@ -19,7 +19,7 @@ npm install xevt
 Then:
 
 ```typescript
-import { Xemitter } from "xevt";
+import { Xevt } from "xevt";
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ import { Xemitter } from "xevt";
 ### Basic usage
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let result = 0;
 emitter.on("event", () => {
@@ -39,7 +39,7 @@ emitter.emit("event");
 ### Async event
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let result = 0;
 emitter.onAsync("event", async () => {
@@ -50,8 +50,10 @@ await emitter.emit("event");
 
 ### Conjoined event
 
+IMPORTANT: conjoined events are not supported any arguments in handlers.
+
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 
 let count = 0;
 emitter.on(["event1", "event2"], () => {
@@ -59,12 +61,14 @@ emitter.on(["event1", "event2"], () => {
 });
 emitter.emit("event1");
 emitter.emit("event2");
+
+console.log(count); // 1
 ```
 
 ### Mixed async/sync handlers
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 const result: number[] = [];
 emitter.on("event", (data) => {
   result.push(data);
@@ -83,10 +87,12 @@ emitter.onAsync(
 for (let i = 0; i < 5; i++) {
   emitter.emit("event", i);
 }
+
+// [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
 ```typescript
-const emitter = new Xemitter();
+const emitter = new Xevt();
 const result: number[] = [];
 emitter.conjoin(["event1", "event2"], async () => {
   result.push(1);
@@ -99,4 +105,6 @@ for (let i = 0; i < 5; i++) {
   emitter.emit("event1");
   emitter.emit("event2");
 }
+
+// [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 ```

@@ -15,5 +15,5 @@
     "@deno/dnt": "jsr:@deno/dnt@^0.41.1",
     "modules/": "./modules/"
   },
-  "exports": "./modules/xemitter.ts"
+  "exports": "./modules/xevt.ts"
 }
