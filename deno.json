@@ -11,7 +11,9 @@
       "exclude": ["no-explicit-any"]
     }
   },
-  "imports": { "@deno/dnt": "jsr:@deno/dnt@^0.41.1", "modules/": "./modules/" },
-  "exports": "./modules/xemitter.ts",
-  "exclude": ["node_modules", "dist", ".github", "examples", "tests"]
+  "imports": {
+    "@deno/dnt": "jsr:@deno/dnt@^0.41.1",
+    "modules/": "./modules/"
+  },
+  "exports": "./modules/xemitter.ts"
 }
