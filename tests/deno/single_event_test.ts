@@ -87,7 +87,7 @@ describe("Xemitter - single event", () => {
         setTimeout(() => {
           result.push(arg);
           resolve(true);
-        }, 100)
+        }, 10)
       );
     });
     emitter.emit("event", 1);
@@ -98,7 +98,7 @@ describe("Xemitter - single event", () => {
     emitter.emit("event", 6);
     emitter.emit("event", 7);
     emitter.emit("event", 8);
-    await delay(1000);
+    await delay(100);
     assertEquals(result, [1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });

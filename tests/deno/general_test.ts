@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "jsr:@std/assert";
+import { assert, assertEquals, assertIsError } from "jsr:@std/assert";
 import { describe, it } from "jsr:@std/testing/bdd";
 
 import { Xemitter } from "modules/xemitter.ts";
@@ -18,4 +18,52 @@ it("list all events", () => {
     "test1.test2",
     "test2.test3",
   ]);
+});
+
+it("catch error", () => {
+  const emitter = new Xemitter();
+  let count = 0;
+  emitter.on("error", (error) => {
+    assertIsError(error);
+    count += 1;
+  });
+  emitter.error((err) => {
+    assertIsError(err);
+    count += 1;
+  });
+  emitter.on("event", () => {
+    throw new Error("Test error");
+  });
+  emitter.emit("event");
+
+  assert(count === 2, `Expected 2, got ${count}`);
+});
+
+it("remove event handlers", () => {
+  const emitter = new Xemitter();
+  let count = 0;
+  const handler = () => {
+    count += 1;
+  };
+  emitter.on("event", handler);
+  emitter.emit("event");
+  emitter.off("event");
+  emitter.emit("event");
+  assert(count === 1, `Expected 1, got ${count}`);
+});
+
+it("remove conjoined event handlers", () => {
+  const emitter = new Xemitter();
+  let count = 0;
+  const handler = () => {
+    count += 1;
+  };
+  emitter.conjoin(["event1", "event2"], handler);
+  emitter.emit("event1");
+  emitter.emit("event1");
+  emitter.emit("event2");
+  emitter.off(["event1", "event2"]);
+  emitter.emit("event1");
+  emitter.emit("event2");
+  assert(count === 1, `Expected 0, got ${count}`);
 });

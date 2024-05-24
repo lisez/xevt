@@ -88,18 +88,18 @@ describe("Xemitter - multiple events", () => {
         setTimeout(() => {
           result++;
           resolve(true);
-        }, 100)
+        }, 10)
       );
     });
-    emitter.emit("event1", 1);
-    emitter.emit("event2", 2);
-    emitter.emit("event1", 3);
-    emitter.emit("event2", 4);
-    emitter.emit("event1", 5);
-    emitter.emit("event2", 6);
-    emitter.emit("event1", 7);
-    emitter.emit("event2", 8);
-    await delay(1000);
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    emitter.emit("event1");
+    emitter.emit("event2");
+    await delay(100);
     assertEquals(result, 4);
   });
 });

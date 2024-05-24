@@ -131,7 +131,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
           return this.exec(pointer + 1, events);
         } else {
           return this.internalExec(0, handlers).catch((err: unknown) => {
-            this.errorEmitter.emit("error", err);
+            throw err;
           }).then(() => {
             return this.exec(pointer + 1, events);
           });
