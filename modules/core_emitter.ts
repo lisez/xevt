@@ -10,9 +10,7 @@ import type {
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
 
-  constructor(
-    handlers?: RegisteredHandlers,
-  ) {
+  constructor(handlers?: RegisteredHandlers) {
     this.handlers = handlers || new Map();
   }
 
@@ -30,9 +28,9 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     const profile = signatures[pointer];
     if (!profile) return;
     if (profile.options?.async) {
-      return profile.handler(...args).then(() =>
-        this.internalExec(pointer + 1, signatures, ...args)
-      );
+      return profile
+        .handler(...args)
+        .then(() => this.internalExec(pointer + 1, signatures, ...args));
     }
     profile.handler(...args);
     return this.internalExec(pointer + 1, signatures, ...args);
@@ -45,8 +43,8 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     if (
       signature.options?.async &&
       // @ts-ignore TS7053
-      ((signature.handler[Symbol.toStringTag] !== "AsyncFunction") &&
-        !("then" in signature.handler))
+      signature.handler[Symbol.toStringTag] !== "AsyncFunction" &&
+      !("then" in signature.handler)
     ) {
       throw new Error("Async handler must be a promise or thenable");
     }
@@ -72,10 +70,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     if (idx !== -1) handlers.splice(idx, 1);
   }
 
-  abstract off(
-    event: T,
-    handler?: EventHandler,
-  ): void;
+  abstract off(event: T, handler?: EventHandler): void;
 
   get removeEventListener() {
     return this.off;

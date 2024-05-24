@@ -59,9 +59,13 @@ describe("Xemitter - single event", () => {
   it("should listen event once", () => {
     const emitter = new Xemitter();
     let count = 0;
-    emitter.on("event", () => {
-      count++;
-    }, { once: true });
+    emitter.on(
+      "event",
+      () => {
+        count++;
+      },
+      { once: true },
+    );
 
     emitter.emit("event");
     emitter.emit("event");
@@ -87,7 +91,7 @@ describe("Xemitter - single event", () => {
         setTimeout(() => {
           result.push(arg);
           resolve(true);
-        }, 10)
+        }, 10),
       );
     });
     emitter.emit("event", 1);
@@ -100,5 +104,29 @@ describe("Xemitter - single event", () => {
     emitter.emit("event", 8);
     await delay(100);
     assertEquals(result, [1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it("mix handlers", async () => {
+    const emitter = new Xemitter();
+    const result: number[] = [];
+    emitter.on("event", (data) => {
+      result.push(data);
+    });
+    emitter.onAsync(
+      "event",
+      async (data) =>
+        new Promise((res) => {
+          setTimeout(() => {
+            result.push(data);
+            res(true);
+          }, 10);
+        }),
+    );
+
+    for (let i = 0; i < 5; i++) {
+      await emitter.emit("event", i);
+    }
+    await delay(100);
+    assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
   });
 });
