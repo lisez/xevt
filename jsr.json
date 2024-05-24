@@ -1,5 +1,0 @@
-{
-  "name": "@lisez/xevt",
-  "exports": "./modules/xemitter.ts",
-  "exclude": ["node_modules", "dist", ".github", "examples", "tests"]
-}

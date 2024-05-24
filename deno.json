@@ -1,5 +1,5 @@
 {
-  "name": "xevt",
+  "name": "@lisez/xevt",
   "version": "0.3.1",
   "tasks": {
     "dev": "deno run --watch main.ts",
@@ -12,12 +12,6 @@
     }
   },
   "imports": { "@deno/dnt": "jsr:@deno/dnt@^0.41.1", "modules/": "./modules/" },
-  "exports": {
-    "./emitter": "./modules/emitter.ts",
-    "./helpers": "./modules/helpers.ts",
-    "./xemitter": "./modules/xemitter.ts",
-    "./core_emitter": "./modules/core_emitter.ts",
-    "./conjoin_emitter": "./modules/conjoin_emitter.ts",
-    "./types": "./modules/types.ts"
-  }
+  "exports": "./modules/xemitter.ts",
+  "exclude": ["node_modules", "dist", ".github", "examples", "tests"]
 }
