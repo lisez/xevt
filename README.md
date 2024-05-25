@@ -8,7 +8,7 @@ features:
 - support conjoined events.
 - support mixed async/sync handlers.
 
-[![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg?branch=feature/0.2.0)](https://coveralls.io/github/lisez/xevt?branch=feature/0.2.0)
+[![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg?branch=feature/0.2.0)](https://coveralls.io/github/lisez/xevt?branch=feature/0.2.0) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 
@@ -108,3 +108,10 @@ for (let i = 0; i < 5; i++) {
 
 // [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 ```
+
+## Similar projects
+
+- [mitt](https://github.com/developit/mitt)
+- [emittery](https://github.com/sindresorhus/emittery)
+- [eventemitter3](https://github.com/primus/eventemitter3)
+- [evt](https://github.com/garronej/evt)
