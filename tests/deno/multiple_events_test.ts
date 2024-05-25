@@ -23,6 +23,17 @@ describe("Xevt - multiple events", () => {
     assert(count === 2, `Expected 2, got ${count}`);
   });
 
+  it("should listen numeric events", () => {
+    const emitter = new Xevt();
+    let result = 0;
+    emitter.on([0, 1], () => {
+      result++;
+    });
+    emitter.emit(0);
+    emitter.emit(1);
+    assert(result === 1, `Expected 1, got ${result}`);
+  });
+
   it("should listen multiple handlers", () => {
     const emitter = new Xevt();
     const result: number[] = [];

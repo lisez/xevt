@@ -20,6 +20,16 @@ describe("Xevt - single event", () => {
     assert(result === 1, `Expected 1, got ${result}`);
   });
 
+  it("should listen numeric events", () => {
+    const emitter = new Xevt();
+    let result = 0;
+    emitter.on(1, () => {
+      result++;
+    });
+    emitter.emit(1);
+    assert(result === 1, `Expected 1, got ${result}`);
+  });
+
   it("should listen event multiple times", () => {
     const emitter = new Xevt();
 

@@ -1,4 +1,4 @@
-export type EventName = string | symbol;
+export type EventName = string | symbol | number;
 
 export type ConjoinEvents = [EventName, EventName, ...EventName[]];
 
