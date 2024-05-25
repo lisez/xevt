@@ -12,10 +12,8 @@ import type {
 import { CoreEmitter } from "./core_emitter.ts";
 import { Emitter } from "./emitter.ts";
 
-export class ConjoinEmitter
-  extends CoreEmitter<ConjoinEvents>
-  implements XConjoinEmitter
-{
+export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
+  implements XConjoinEmitter {
   private nameIndex: Map<EventName, number> = new Map();
   private conjoinedNames: Map<EventName, ConjoinEvents> = new Map();
   private indexCounter = 0;
@@ -23,6 +21,7 @@ export class ConjoinEmitter
   private idleQueue: PendingConjoinEvent[] = [];
   private errorEmitter = new Emitter();
   private prevEvents?: Promise<any>;
+  debug = false;
 
   private internalConjoinOn(signature: EventHandlerSignature<ConjoinEvents>) {
     if (signature.name.length < 2) {
@@ -139,6 +138,7 @@ export class ConjoinEmitter
   }
 
   emit(event: EventName): any {
+    if (this.debug) this.logger.debug("emit", event);
     if (!this.nameIndex.has(event)) return;
 
     let executing: EventName[] = [];
@@ -157,6 +157,7 @@ export class ConjoinEmitter
     }));
 
     if (executing.length) {
+      if (this.debug) this.logger.debug("conjoined", executing);
       if (this.prevEvents) {
         this.prevEvents = this.prevEvents.then(() => this.exec(0, executing));
       } else {
