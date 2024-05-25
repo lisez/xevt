@@ -109,6 +109,15 @@ for (let i = 0; i < 5; i++) {
 // [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 ```
 
+### Debug mode
+
+```typescript
+const emitter = new Xevt();
+emitter.debug = true;
+```
+
+Then you can see the debug information in the console.
+
 ## Similar projects
 
 - [mitt](https://github.com/developit/mitt)

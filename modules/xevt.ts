@@ -20,12 +20,23 @@ export class Xevt extends CoreEmitter<XeventName>
   implements XevtEmitter, XConjoinEmitter {
   private emitter: Emitter;
   private conjoinEmitter: ConjoinEmitter;
+  private _debug = false;
 
   constructor(map?: RegisteredHandlers) {
     super(map);
 
     this.emitter = new Emitter(this.handlers);
     this.conjoinEmitter = new ConjoinEmitter(this.handlers);
+  }
+
+  set debug(debug: boolean) {
+    this.emitter.debug = debug;
+    this.conjoinEmitter.debug = debug;
+    this._debug = debug;
+  }
+
+  get debug() {
+    return this._debug;
   }
 
   on(

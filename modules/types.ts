@@ -53,6 +53,8 @@ export type EventUnregister<T> = Record<
 
 export type XCoreEmitter<T> =
   & {
+    debug: boolean;
+    logger: Pick<Console, "debug">;
     eventNames(): EventName[];
     emit(event: EventName, ...args: any[]): void;
     error(handler: ErrorHandler): void;

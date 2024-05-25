@@ -12,6 +12,7 @@ export const EmitDone = Symbol("emit_done");
 
 export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   private prevEvents?: Promise<any>;
+  debug = false;
 
   on(event: EventName, handler: EventHandler, options?: Partial<EventOptions>) {
     const signature = {
@@ -49,6 +50,8 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   }
 
   emit(event: EventName, ...args: any[]): any {
+    if (this.debug) this.logger.debug("emit", event, args);
+
     const handlers = this.handlers.get(event)?.slice() || [];
     handlers
       .filter((e) => e.options?.once)
@@ -59,7 +62,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
     try {
       if (this.prevEvents) {
         this.prevEvents = this.prevEvents.then(() =>
-          this.internalExec(0, handlers, ...args),
+          this.internalExec(0, handlers, ...args)
         );
       } else {
         this.prevEvents = this.internalExec(0, handlers, ...args);

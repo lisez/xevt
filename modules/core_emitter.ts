@@ -7,8 +7,13 @@ import type {
   XCoreEmitter,
 } from "./types.ts";
 
+import { Logger } from "./logger.ts";
+
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
+  abstract debug: boolean;
+
+  logger = new Logger();
 
   constructor(handlers?: RegisteredHandlers) {
     this.handlers = handlers || new Map();
@@ -48,6 +53,8 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     ) {
       throw new Error("Async handler must be a promise or thenable");
     }
+
+    if (this.debug) this.logger.debug("on", name, signature);
 
     const handlers = this.handlers.get(name);
     if (handlers) {
