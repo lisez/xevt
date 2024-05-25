@@ -21,7 +21,8 @@ await build({
   },
   compilerOptions: {
     target: "ES2015",
-    lib: ["ES2019.Array", "ES2015"],
+    // INFO: https://stackoverflow.com/questions/42105984/cannot-find-name-console-what-could-be-the-reason-for-this
+    lib: ["ES2019.Array", "ES2015", "DOM"],
   },
   package: {
     // package.json properties
