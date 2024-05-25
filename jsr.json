@@ -1,4 +1,0 @@
-{
-  "name": "@lisez/xevt",
-  "exclude": ["node_modules", "dist", ".github", "examples", "tests"]
-}
