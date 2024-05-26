@@ -3,6 +3,7 @@ import type {
   EventHandler,
   EventHandlerSignature,
   EventName,
+  EventUnscriber,
   RegisteredHandlers,
   XCoreEmitter,
 } from "./types.ts";
@@ -44,7 +45,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected onBySignature(
     name: EventName,
     signature: EventHandlerSignature<any>,
-  ): void {
+  ): EventUnscriber {
     if (
       signature.options?.async &&
       // @ts-ignore TS7053
@@ -62,6 +63,8 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     } else {
       this.handlers.set(name, [signature]);
     }
+
+    return () => this.offByHandler(name, signature.handler);
   }
 
   abstract error(handler: ErrorHandler): void;

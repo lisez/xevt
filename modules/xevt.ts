@@ -45,9 +45,9 @@ export class Xevt extends CoreEmitter<XeventName>
     options?: Partial<EventOptions>,
   ) {
     if (isConjoinEvents(event)) {
-      this.conjoinEmitter.on(event, handler, options);
+      return this.conjoinEmitter.on(event, handler, options);
     } else {
-      this.emitter.on(event, handler, options);
+      return this.emitter.on(event, handler, options);
     }
   }
 

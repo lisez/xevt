@@ -170,3 +170,19 @@ describe("Xevt - multiple events", () => {
     assertEquals(result, [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]);
   });
 });
+
+describe("Xevt - unscriber", () => {
+  it("return unscribe function", () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    const unscribe = emitter.conjoin(["event1", "event2"], () => {
+      result.push(1);
+    });
+    emitter.emit("event1");
+    emitter.emit("event2");
+    unscribe();
+    emitter.emit("event1");
+    emitter.emit("event2");
+    assertEquals(result, [1]);
+  });
+});

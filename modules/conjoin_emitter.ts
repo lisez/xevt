@@ -40,7 +40,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       this.idleQueue.push({ event: name, conjoined: signature.name.slice() });
     }
 
-    this.onBySignature(name, signature);
+    return this.onBySignature(name, signature);
   }
 
   getConjoinedEventName(events: EventName[] | ConjoinEvents): EventName {
@@ -61,7 +61,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         once: options?.once || false,
       },
     };
-    this.internalConjoinOn(signature);
+    return this.internalConjoinOn(signature);
   }
 
   get on() {
@@ -85,7 +85,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
         async: true,
       },
     };
-    this.internalConjoinOn(signature);
+    return this.internalConjoinOn(signature);
   }
 
   error(handler: ErrorHandler) {

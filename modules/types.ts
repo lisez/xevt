@@ -20,17 +20,19 @@ export type EventHandlerSignature<T> = {
   >;
 };
 
+export type EventUnscriber = () => void;
+
 export type EventRegister = (
   event: EventName,
   handler: EventHandler,
   options?: Partial<EventOptions>,
-) => void;
+) => EventUnscriber;
 
 export type ConjoinEventsRegister = (
   events: ConjoinEvents,
   handler: EventHandler,
   options?: Partial<EventOptions>,
-) => void;
+) => EventUnscriber;
 
 export type RegisteredHandlers = Map<
   EventName,
