@@ -59,7 +59,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   protected offByHandler(event: EventName, handler: EventHandler): void {
     const handlers = this.handlers.get(event);
-    if (!handlers) return;
+    if (!handlers?.length) return;
     const idx = handlers.findIndex((h) => h.handler === handler);
     if (idx !== -1) handlers.splice(idx, 1);
   }
