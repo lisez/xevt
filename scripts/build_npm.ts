@@ -4,8 +4,6 @@ const denoInfo = await import("../deno.json", { with: { type: "json" } }).then(
   (e) => e.default,
 );
 
-const currentDir = import.meta.dirname;
-
 const output = "./dist";
 
 await emptyDir(output);
@@ -15,6 +13,7 @@ await build({
   typeCheck: "both",
   entryPoints: ["./modules/xevt.ts"],
   outDir: output,
+  importMap: "deno.json",
   shims: {
     deno: false,
     undici: false,
