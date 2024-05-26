@@ -119,11 +119,9 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     if (!event) return;
 
     const handlers = this.handlers.get(event)?.slice() || [];
-    handlers
-      .filter((e) => e.options?.once)
-      .forEach((e) => {
-        this.offByHandler(event, e.handler);
-      });
+    for (const e of handlers.filter((e) => e.options?.once)) {
+      this.offByHandler(event, e.handler);
+    }
 
     try {
       if (handlers.length) {

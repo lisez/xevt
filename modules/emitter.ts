@@ -54,11 +54,9 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
     if (this.debug) this.logger.debug("emit", event, args);
 
     const handlers = this.handlers.get(event)?.slice() || [];
-    handlers
-      .filter((e) => e.options?.once)
-      .forEach((e) => {
-        this.offByHandler(event, e.handler);
-      });
+    for (const e of handlers.filter((e) => e.options?.once)) {
+      this.offByHandler(event, e.handler);
+    }
 
     try {
       if (this.prevEvents) {
