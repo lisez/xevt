@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.1 (2024-05-27)
+
+- Refatoring
+
 ## v0.6.0 (2024-05-26)
 
 - implement #12
