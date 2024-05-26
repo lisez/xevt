@@ -4,9 +4,9 @@ another event emiiter.
 
 features:
 
-- support async event.
-- support conjoined events.
-- support mixed async/sync handlers.
+- can listen async/conjoined event.
+- support to mixed async/sync handlers.
+- return unscriber when you subscribe an event.
 
 [![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg)](https://coveralls.io/github/lisez/xevt) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -107,6 +107,26 @@ for (let i = 0; i < 5; i++) {
 }
 
 // [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+```
+
+## Return unscriber after registered an event
+
+```typescript
+const emitter = new Xevt();
+const result: number[] = [];
+const unscribe = emitter.on("event", (arg: number) => {
+  result.push(arg);
+});
+unscribe();
+```
+
+```typescript
+const emitter = new Xevt();
+const result: number[] = [];
+const unscribe = emitter.conjoin(["event1", "event2"], () => {
+  result.push(1);
+});
+unscribe();
 ```
 
 ### Debug mode
