@@ -140,3 +140,17 @@ describe("Xevt - single event", () => {
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
   });
 });
+
+describe("Xevt - unscriber", () => {
+  it("return unscribe function", () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    const unscribe = emitter.on("event", (arg: number) => {
+      result.push(arg);
+    });
+    emitter.emit("event", 1);
+    unscribe();
+    emitter.emit("event", 2);
+    assertEquals(result, [1]);
+  });
+});

@@ -22,7 +22,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
         once: options?.once || event === EmitDone,
       },
     };
-    this.onBySignature(event, signature);
+    return this.onBySignature(event, signature);
   }
 
   get addEventListener() {
@@ -42,7 +42,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
         async: true,
       },
     };
-    this.onBySignature(event, signature);
+    return this.onBySignature(event, signature);
   }
 
   error(handler: ErrorHandler) {
