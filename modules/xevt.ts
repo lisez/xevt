@@ -7,12 +7,12 @@ import type {
   RegisteredHandlers,
   XConjoinEmitter,
   XevtEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
-import { CoreEmitter } from "./core_emitter.ts";
-import { isConjoinEvents } from "./helpers.ts";
-import { ConjoinEmitter } from "./conjoin_emitter.ts";
-import { EmitDone, Emitter } from "./emitter.ts";
+import { CoreEmitter } from "modules/core_emitter.ts";
+import { isConjoinEvents } from "modules/helpers.ts";
+import { ConjoinEmitter } from "modules/conjoin_emitter.ts";
+import { EmitDone, Emitter } from "modules/emitter.ts";
 
 export type XeventName = EventName | ConjoinEvents;
 

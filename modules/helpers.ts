@@ -1,4 +1,4 @@
-import type { ConjoinEvents, EventName } from "./types.ts";
+import type { ConjoinEvents, EventName } from "modules/types.ts";
 
 export function isConjoinEvents(
   event: EventName | EventName[] | ConjoinEvents,

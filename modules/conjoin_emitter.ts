@@ -7,7 +7,7 @@ import type {
   EventOptions,
   PendingConjoinEvent,
   XConjoinEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";

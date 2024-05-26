@@ -6,9 +6,9 @@ import type {
   EventUnscriber,
   RegisteredHandlers,
   XCoreEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
-import { Logger } from "./logger.ts";
+import { Logger } from "modules/logger.ts";
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;

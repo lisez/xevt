@@ -4,7 +4,7 @@ import type {
   EventName,
   EventOptions,
   XevtEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { SequenceRunner } from "modules/runners/sequence.ts";
