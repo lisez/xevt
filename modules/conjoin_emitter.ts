@@ -48,8 +48,12 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     return this.onBySignature(name, signature);
   }
 
-  getConjoinedEventName(events: EventName[] | ConjoinEvents): EventName {
-    const keys = ([] as EventName[]).concat(events);
+  private getConjoinedEventName(
+    events: EventName[] | ConjoinEvents,
+  ): EventName {
+    const keys = ([] as EventName[]).concat(events).map((e) =>
+      this.nameIndex.get(e)
+    );
     keys.sort();
     return keys.join(".");
   }
