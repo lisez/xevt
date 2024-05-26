@@ -73,9 +73,11 @@ export class Xevt extends CoreEmitter<XeventName>
   }
 
   emit(event: EventName, ...args: any[]): void {
-    this.emitter.on(EmitDone, () => {
-      this.conjoinEmitter.emit(event);
-    });
+    if (this.conjoinEmitter.hasEvent(event)) {
+      this.emitter.on(EmitDone, () => {
+        this.conjoinEmitter.emit(event);
+      });
+    }
     this.emitter.emit(event, ...args);
   }
 

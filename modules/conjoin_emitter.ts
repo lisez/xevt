@@ -24,6 +24,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   private prevEvents?: Promise<any>;
   debug = false;
 
+  hasEvent(event: EventName): boolean {
+    return this.nameIndex.has(event);
+  }
+
   private internalConjoinOn(signature: EventHandlerSignature<ConjoinEvents>) {
     if (signature.name.length < 2) {
       throw new RangeError("Conjoin events must have at least two events");
@@ -138,7 +142,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
 
   emit(event: EventName): any {
     if (this.debug) this.logger.debug("emit", event);
-    if (!this.nameIndex.has(event)) return;
+    if (!this.hasEvent(event)) return;
 
     let executing: EventName[] = [];
     let nextIdle: PendingConjoinEvent[] = [];

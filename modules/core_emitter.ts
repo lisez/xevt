@@ -24,6 +24,10 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     return Array.from(this.handlers.keys()).flat();
   }
 
+  hasEvent(event: EventName): boolean {
+    return !!this.handlers.has(event);
+  }
+
   abstract emit(event: EventName, ...args: any[]): void;
 
   protected onBySignature(
