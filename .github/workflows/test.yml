@@ -2,6 +2,9 @@ name: testing
 
 on:
   push:
+    paths:
+      - "**.ts"
+      - "**.js"
     branches:
       - main
       - develop
