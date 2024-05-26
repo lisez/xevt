@@ -1,8 +1,13 @@
 # Changelog
 
+## v0.6.2 (2024-05-27)
+
+- Fix import map.
+- Fix typo.
+
 ## v0.6.1 (2024-05-27)
 
-- Refatoring
+- Rafactoring.
 
 ## v0.6.0 (2024-05-26)
 
