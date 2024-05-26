@@ -26,22 +26,6 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   abstract emit(event: EventName, ...args: any[]): void;
 
-  protected internalExec(
-    pointer: number,
-    signatures: EventHandlerSignature<any>[],
-    ...args: any[]
-  ): any {
-    const profile = signatures[pointer];
-    if (!profile) return;
-    if (profile.options?.async) {
-      return profile
-        .handler(...args)
-        .then(() => this.internalExec(pointer + 1, signatures, ...args));
-    }
-    profile.handler(...args);
-    return this.internalExec(pointer + 1, signatures, ...args);
-  }
-
   protected onBySignature(
     name: EventName,
     signature: EventHandlerSignature<any>,

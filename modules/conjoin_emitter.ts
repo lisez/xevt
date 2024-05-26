@@ -9,8 +9,9 @@ import type {
   XConjoinEmitter,
 } from "./types.ts";
 
-import { CoreEmitter } from "./core_emitter.ts";
-import { Emitter } from "./emitter.ts";
+import { CoreEmitter } from "modules/core_emitter.ts";
+import { Emitter } from "modules/emitter.ts";
+import { SequenceRunner } from "modules/runners/sequence.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
@@ -126,7 +127,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
 
     try {
       if (handlers.length) {
-        const result = this.internalExec(0, handlers);
+        const result = new SequenceRunner(handlers).exec(0);
         if (result) {
           return result.then(() => this.exec(pointer + 1, events));
         }
