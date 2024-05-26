@@ -7,10 +7,11 @@ import type {
   EventOptions,
   PendingConjoinEvent,
   XConjoinEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
-import { CoreEmitter } from "./core_emitter.ts";
-import { Emitter } from "./emitter.ts";
+import { CoreEmitter } from "modules/core_emitter.ts";
+import { Emitter } from "modules/emitter.ts";
+import { SequenceRunner } from "modules/runners/sequence.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
@@ -22,6 +23,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   private errorEmitter = new Emitter();
   private prevEvents?: Promise<any>;
   debug = false;
+
+  hasEvent(event: EventName): boolean {
+    return this.nameIndex.has(event);
+  }
 
   private internalConjoinOn(signature: EventHandlerSignature<ConjoinEvents>) {
     if (signature.name.length < 2) {
@@ -118,15 +123,13 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     if (!event) return;
 
     const handlers = this.handlers.get(event)?.slice() || [];
-    handlers
-      .filter((e) => e.options?.once)
-      .forEach((e) => {
-        this.offByHandler(event, e.handler);
-      });
+    for (const e of handlers.filter((e) => e.options?.once)) {
+      this.offByHandler(event, e.handler);
+    }
 
     try {
       if (handlers.length) {
-        const result = this.internalExec(0, handlers);
+        const result = new SequenceRunner(handlers).exec(0);
         if (result) {
           return result.then(() => this.exec(pointer + 1, events));
         }
@@ -139,7 +142,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
 
   emit(event: EventName): any {
     if (this.debug) this.logger.debug("emit", event);
-    if (!this.nameIndex.has(event)) return;
+    if (!this.hasEvent(event)) return;
 
     let executing: EventName[] = [];
     let nextIdle: PendingConjoinEvent[] = [];

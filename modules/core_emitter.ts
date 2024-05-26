@@ -6,9 +6,9 @@ import type {
   EventUnscriber,
   RegisteredHandlers,
   XCoreEmitter,
-} from "./types.ts";
+} from "modules/types.ts";
 
-import { Logger } from "./logger.ts";
+import { Logger } from "modules/logger.ts";
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
@@ -24,23 +24,11 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     return Array.from(this.handlers.keys()).flat();
   }
 
-  abstract emit(event: EventName, ...args: any[]): void;
-
-  protected internalExec(
-    pointer: number,
-    signatures: EventHandlerSignature<any>[],
-    ...args: any[]
-  ): any {
-    const profile = signatures[pointer];
-    if (!profile) return;
-    if (profile.options?.async) {
-      return profile
-        .handler(...args)
-        .then(() => this.internalExec(pointer + 1, signatures, ...args));
-    }
-    profile.handler(...args);
-    return this.internalExec(pointer + 1, signatures, ...args);
+  hasEvent(event: EventName): boolean {
+    return !!this.handlers.has(event);
   }
+
+  abstract emit(event: EventName, ...args: any[]): void;
 
   protected onBySignature(
     name: EventName,
@@ -75,7 +63,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   protected offByHandler(event: EventName, handler: EventHandler): void {
     const handlers = this.handlers.get(event);
-    if (!handlers) return;
+    if (!handlers?.length) return;
     const idx = handlers.findIndex((h) => h.handler === handler);
     if (idx !== -1) handlers.splice(idx, 1);
   }
