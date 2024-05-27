@@ -11,6 +11,9 @@ on:
   pull_request:
     branches:
       - "**"
+    paths:
+      - "**.ts"
+      - "**.js"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +25,7 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.node-version }}
-      - run: deno test --parallel --coverage=.coverage && deno coverage .coverage --lcov cov > cov.lcov
+      - run: deno lint && deno test --parallel --coverage=.coverage && deno coverage .coverage --lcov cov > cov.lcov
       - name: Upload coverage to Coveralls.io
         uses: coverallsapp/github-action@master
         with:
