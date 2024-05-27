@@ -1,31 +1,19 @@
 import type { EventHandlerSignature } from "modules/types.ts";
 
+import { SingleRunner } from "modules/runners/single.ts";
+
 /**
  * Run handlers in sequence.
  */
-export class SequenceRunner {
+export class SequenceRunner<
+  T extends EventHandlerSignature<any> = EventHandlerSignature<any>,
+> {
   /**
    * Create a new instance of the SequenceRunner.
    * @param handlers The handlers to run.
    */
-  constructor(private handlers: EventHandlerSignature<any>[]) {
+  constructor(private handlers: T[]) {
     this.handlers = handlers;
-  }
-
-  /**
-   * Wait for the handler to finish before moving to the next handler.
-   * @param pointer The current handler index.
-   * @param profile The handler profile.
-   * @param args The arguments to pass to the handlers.
-   */
-  private asyncExec(
-    pointer: number,
-    profile: EventHandlerSignature<any>,
-    ...args: any[]
-  ): Promise<void> {
-    return Promise.resolve(profile.handler(...args)).then(() =>
-      this.exec(pointer + 1, ...args)
-    );
   }
 
   /**
@@ -33,13 +21,25 @@ export class SequenceRunner {
    * @param pointer The current handler index.
    * @param args The arguments to pass to the handlers.
    */
-  exec(pointer: number = 0, ...args: any[]): void | Promise<void> {
+  exec(
+    pointer: number = 0,
+    ...args: Parameters<T["handler"]>
+  ): void | Promise<void> {
     const profile = this.handlers[pointer];
     if (!profile) return;
+
+    const result = new SingleRunner<T>(profile).exec(
+      ...args,
+    );
+
+    /**
+     * Wait for the handler to finish before moving to the next handler.
+     */
     if (profile.options?.async) {
-      return this.asyncExec(pointer, profile, ...args);
+      return Promise.resolve(result).then(() =>
+        this.exec(pointer + 1, ...args)
+      );
     }
-    profile.handler(...args);
     return this.exec(pointer + 1, ...args);
   }
 }
