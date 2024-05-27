@@ -43,7 +43,10 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     const name = this.getConjoinedEventName(signature.name);
     if (!this.conjoinedNames.has(name)) {
       this.conjoinedNames.set(name, signature.name);
-      this.idleQueue.push({ event: name, conjoined: signature.name.slice() });
+      this.idleQueue.enqueue({
+        event: name,
+        conjoined: signature.name.slice(),
+      });
     }
 
     return this.onBySignature(name, signature);
@@ -110,10 +113,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     }
   }
 
-  emit(event: EventName): any {
-    if (this.debug) this.logger.debug("emit", event);
-    if (!this.hasEvent(event)) return;
-
+  private consume(event: EventName): EventName[] {
     let executing: EventName[] = [];
     let nextIdle: PendingConjoinEvent[] = [];
 
@@ -131,6 +131,14 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       })),
     );
 
+    return executing;
+  }
+
+  emit(event: EventName): any {
+    if (this.debug) this.logger.debug("emit", event);
+    if (!this.hasEvent(event)) return;
+
+    const executing = this.consume(event);
     if (executing.length) {
       if (this.debug) this.logger.debug("conjoined", executing);
       if (this.prevEvents) {
