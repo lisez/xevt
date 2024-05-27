@@ -54,9 +54,11 @@ describe("Xevt - multiple events", () => {
   it("should listen multiple async handlers", async () => {
     const emitter = new Xevt();
     const result: number[] = [];
+    // deno-lint-ignore require-await
     emitter.conjoin(["event1", "event2"], async () => {
       result.push(1);
     });
+    // deno-lint-ignore require-await
     emitter.conjoin(["event1", "event2"], async () => {
       result.push(2);
     });
@@ -158,6 +160,7 @@ describe("Xevt - multiple events", () => {
     emitter.conjoin(["event1", "event2"], () => {
       result.push(1);
     });
+    // deno-lint-ignore require-await
     emitter.conjoin(["event1", "event2"], async () => {
       result.push(2);
     });
