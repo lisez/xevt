@@ -1,4 +1,4 @@
-import type { EventHandlerSignature } from "modules/types.ts";
+import type { GeneralEventHandlerSignature } from "modules/types.ts";
 
 /**
  * The result of a single runner.
@@ -11,7 +11,9 @@ export type SingleRunnerResult<T extends (...args: any[]) => any> = ReturnType<
  * Run a handler.
  */
 export class SingleRunner<
-  T extends EventHandlerSignature<any> = EventHandlerSignature<any>,
+  T extends GeneralEventHandlerSignature<any> = GeneralEventHandlerSignature<
+    any
+  >,
 > {
   /**
    * Create a new instance of the SingleRunner.

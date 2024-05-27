@@ -1,4 +1,4 @@
-import type { EventHandlerSignature } from "modules/types.ts";
+import type { GeneralEventHandlerSignature } from "modules/types.ts";
 
 import { SingleRunner } from "modules/runners/single.ts";
 
@@ -6,13 +6,15 @@ import { SingleRunner } from "modules/runners/single.ts";
  * Run handlers in sequence.
  */
 export class SequenceRunner<
-  T extends EventHandlerSignature<any> = EventHandlerSignature<any>,
+  N extends GeneralEventHandlerSignature<any> = GeneralEventHandlerSignature<
+    any
+  >,
 > {
   /**
    * Create a new instance of the SequenceRunner.
    * @param handlers The handlers to run.
    */
-  constructor(private handlers: T[]) {
+  constructor(private handlers: N[]) {
     this.handlers = handlers;
   }
 
@@ -23,12 +25,12 @@ export class SequenceRunner<
    */
   exec(
     pointer: number = 0,
-    ...args: Parameters<T["handler"]>
+    ...args: Parameters<N["handler"]>
   ): void | Promise<void> {
     const profile = this.handlers[pointer];
     if (!profile) return;
 
-    const result = new SingleRunner<T>(profile).exec(
+    const result = new SingleRunner<N>(profile).exec(
       ...args,
     );
 
