@@ -259,12 +259,14 @@ describe("Xevt - onDual", () => {
     });
 
     emitter.onDual("event", {
+      // deno-lint-ignore require-await
       true: async () => {
         result.push("first");
       },
     });
 
     emitter.onDual("event", {
+      // deno-lint-ignore require-await
       false: async () => {
         result.push("fail");
       },
