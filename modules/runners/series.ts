@@ -5,6 +5,7 @@ import type {
 } from "modules/types.ts";
 
 import { SequenceRunner } from "modules/runners/sequence.ts";
+import { StepRunner } from "modules/runners/step.ts";
 
 /**
  * Run handlers each in series.
@@ -39,15 +40,9 @@ export class SeriesRunner {
     const key = series[idx];
     if (!key) return;
 
-    const handlers = this.handlers.get(key)?.slice() || [];
-    for (const p of handlers.filter((p) => !!p.options?.once)) {
-      this.remove(key, p);
-    }
-    if (!handlers.length) return;
-
-    const result = new SequenceRunner(handlers).exec(0);
-    if (result) {
-      return result.then(() => this.exec(series, idx + 1));
+    const step = new StepRunner(this.handlers).exec(key);
+    if (step instanceof Promise) {
+      return step.then(() => this.exec(series, idx + 1));
     }
     return this.exec(series, idx + 1);
   }
