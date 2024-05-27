@@ -70,7 +70,7 @@ export class StepRunner {
   private execInSequence(
     step: EventName,
     handlers: GeneralEventHandlerSignature<any>[],
-    args: any[],
+    args: any[] = [],
   ) {
     for (const p of handlers.filter((e) => !!e.options?.once)) {
       this.remove(step, p);
@@ -85,7 +85,7 @@ export class StepRunner {
   private execByStep(
     step: EventName,
     handlers: EventHandlerSignature<any>[],
-    args: any[],
+    args?: any[],
   ) {
     const categories = handlers.reduce((y, x) => {
       if (x.options?.once) {
@@ -116,7 +116,7 @@ export class StepRunner {
    * @param step The event name.
    * @param args The arguments to pass to the handlers.
    */
-  exec(step: EventName, ...args: any[]): void | Promise<void> {
+  exec(step: EventName, args?: any[]): void | Promise<void> {
     const handlers = this.handlers.get(step)?.slice() || [];
     if (!handlers.length) return;
 

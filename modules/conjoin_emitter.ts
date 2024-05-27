@@ -123,15 +123,18 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     if (!this.hasEvent(event)) return;
 
     const executing = this.consume(event);
-    if (executing.length) {
-      if (this.debug) this.logger.debug("conjoined", executing);
-      if (this.prevEvents) {
-        this.prevEvents = this.prevEvents.then(() => this.exec(executing));
-      } else {
-        this.prevEvents = this.exec(executing);
-      }
+    if (!executing.length) return;
+    if (this.debug) this.logger.debug("conjoined", executing);
+
+    const next = () => {
+      this.prevEvents = this.exec(executing);
+      return this.prevEvents;
+    };
+
+    if (this.prevEvents instanceof Promise) {
+      return Promise.resolve(this.prevEvents).then(next);
     }
-    return this.prevEvents;
+    return next();
   }
 
   off(event: ConjoinEvents, handler?: EventHandler): void {

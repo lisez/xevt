@@ -25,7 +25,7 @@ export class SeriesRunner {
 
     const step = new StepRunner(this.handlers).exec(key);
     if (step instanceof Promise) {
-      return step.then(() => this.exec(series, idx + 1));
+      return Promise.resolve(step).then(() => this.exec(series, idx + 1));
     }
     return this.exec(series, idx + 1);
   }

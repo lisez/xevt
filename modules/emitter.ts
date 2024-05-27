@@ -7,7 +7,7 @@ import type {
 } from "modules/types.ts";
 
 import { CoreEmitter } from "modules/core_emitter.ts";
-import { SequenceRunner } from "modules/runners/sequence.ts";
+import { StepRunner } from "modules/runners/step.ts";
 
 export const EmitDone = Symbol("emit_done");
 
@@ -37,20 +37,16 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   emit(event: EventName, ...args: any[]): any {
     if (this.debug) this.logger.debug("emit", event, args);
 
-    const handlers = this.handlers.get(event)?.slice() || [];
-    for (const e of handlers.filter((e) => e.options?.once)) {
-      this.offByHandler(event, e.handler);
-    }
+    const next = () => {
+      this.prevEvents = new StepRunner(this.handlers).exec(event, args);
+      return this.prevEvents;
+    };
 
     try {
-      if (this.prevEvents) {
-        this.prevEvents = this.prevEvents.then(() =>
-          new SequenceRunner(handlers).exec(0, ...args)
-        );
-      } else {
-        this.prevEvents = new SequenceRunner(handlers).exec(0, ...args);
+      if (this.prevEvents instanceof Promise) {
+        return Promise.resolve(this.prevEvents).then(next);
       }
-      return this.prevEvents;
+      return next();
     } catch (err) {
       this.emit("error", err);
     } finally {
