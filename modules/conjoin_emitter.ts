@@ -11,15 +11,16 @@ import type {
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";
-import { SequenceRunner } from "modules/runners/sequence.ts";
+import { SeriesRunner } from "modules/runners/series.ts";
+import { ConjoinQueue } from "modules/conjoin_queue.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
   private nameIndex: Map<EventName, number> = new Map();
   private conjoinedNames: Map<EventName, ConjoinEvents> = new Map();
   private indexCounter = 0;
-  private waitingQueue: PendingConjoinEvent[] = [];
-  private idleQueue: PendingConjoinEvent[] = [];
+  private waitingQueue = new ConjoinQueue();
+  private idleQueue = new ConjoinQueue();
   private errorEmitter = new Emitter();
   private prevEvents?: Promise<any>;
   debug = false;
@@ -42,14 +43,21 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     const name = this.getConjoinedEventName(signature.name);
     if (!this.conjoinedNames.has(name)) {
       this.conjoinedNames.set(name, signature.name);
-      this.idleQueue.push({ event: name, conjoined: signature.name.slice() });
+      this.idleQueue.enqueue({
+        event: name,
+        conjoined: signature.name.slice(),
+      });
     }
 
     return this.onBySignature(name, signature);
   }
 
-  getConjoinedEventName(events: EventName[] | ConjoinEvents): EventName {
-    const keys = ([] as EventName[]).concat(events);
+  private getConjoinedEventName(
+    events: EventName[] | ConjoinEvents,
+  ): EventName {
+    const keys = ([] as EventName[]).concat(events).map((e) =>
+      this.nameIndex.get(e)
+    );
     keys.sort();
     return keys.join(".");
   }
@@ -97,74 +105,46 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     this.errorEmitter.on("error", handler);
   }
 
-  private scan(event: EventName, queue: PendingConjoinEvent[]) {
-    const fulfill: EventName[] = [];
-    const idle: PendingConjoinEvent[] = [];
-
-    for (const pending of queue) {
-      const found = pending.conjoined.indexOf(event);
-      if (found === -1) {
-        idle.push(pending);
-      } else {
-        pending.conjoined.splice(found, 1);
-        if (pending.conjoined.length === 0) {
-          fulfill.push(pending.event);
-        } else {
-          idle.push(pending);
-        }
-      }
-    }
-
-    return { fulfill, idle };
-  }
-
-  private exec(pointer: number, events: EventName[]): any {
-    const event = events[pointer];
-    if (!event) return;
-
-    const handlers = this.handlers.get(event)?.slice() || [];
-    for (const e of handlers.filter((e) => e.options?.once)) {
-      this.offByHandler(event, e.handler);
-    }
-
+  private exec(events: EventName[]): any {
     try {
-      if (handlers.length) {
-        const result = new SequenceRunner(handlers).exec(0);
-        if (result) {
-          return result.then(() => this.exec(pointer + 1, events));
-        }
-        return this.exec(pointer + 1, events);
-      }
+      return new SeriesRunner(this.handlers).exec(events);
     } catch (e) {
       this.errorEmitter.emit("error", e);
     }
+  }
+
+  private consume(event: EventName): EventName[] {
+    let executing: EventName[] = [];
+    let nextIdle: PendingConjoinEvent[] = [];
+
+    for (const queue of [this.waitingQueue, this.idleQueue]) {
+      const { fulfill, idle } = queue.consume(event);
+      executing = executing.concat(fulfill);
+      nextIdle = nextIdle.concat(idle);
+    }
+
+    this.idleQueue = new ConjoinQueue(nextIdle);
+    this.waitingQueue = new ConjoinQueue(
+      executing.map((e) => ({
+        event: e,
+        conjoined: this.conjoinedNames.get(e)?.slice() || [],
+      })),
+    );
+
+    return executing;
   }
 
   emit(event: EventName): any {
     if (this.debug) this.logger.debug("emit", event);
     if (!this.hasEvent(event)) return;
 
-    let executing: EventName[] = [];
-    let nextIdle: PendingConjoinEvent[] = [];
-
-    for (const queue of [this.waitingQueue, this.idleQueue]) {
-      const { fulfill, idle } = this.scan(event, queue);
-      executing = executing.concat(fulfill);
-      nextIdle = nextIdle.concat(idle);
-    }
-
-    this.idleQueue = nextIdle;
-    this.waitingQueue = executing.map((e) => ({
-      event: e,
-      conjoined: this.conjoinedNames.get(e)?.slice() || [],
-    }));
-
+    const executing = this.consume(event);
     if (executing.length) {
       if (this.debug) this.logger.debug("conjoined", executing);
       if (this.prevEvents) {
-        this.prevEvents = this.prevEvents.then(() => this.exec(0, executing));
+        this.prevEvents = this.prevEvents.then(() => this.exec(executing));
       } else {
-        this.prevEvents = this.exec(0, executing);
+        this.prevEvents = this.exec(executing);
       }
     }
     return this.prevEvents;
