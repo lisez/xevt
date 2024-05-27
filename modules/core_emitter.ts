@@ -1,4 +1,5 @@
 import type {
+  DualEventHandler,
   ErrorHandler,
   EventHandler,
   EventHandlerSignature,
@@ -9,7 +10,6 @@ import type {
 } from "modules/types.ts";
 
 import { Logger } from "modules/logger.ts";
-import { DualEventHandler } from "modules/types.ts";
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;

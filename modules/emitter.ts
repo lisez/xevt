@@ -1,6 +1,6 @@
 import type {
   DualEventHandler,
-  DualEventRegister,
+  DualEventHandlerSignature,
   ErrorHandler,
   EventHandler,
   EventName,
@@ -10,7 +10,6 @@ import type {
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { StepRunner } from "modules/runners/step.ts";
-import { DualEventHandlerSignature } from "modules/types.ts";
 
 export const EmitDone = Symbol("emit_done");
 
