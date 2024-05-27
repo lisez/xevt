@@ -1,6 +1,8 @@
 import type {
   ConjoinEvents,
+  DualEventHandler,
   DualEventHandlerSignature,
+  EventHandler,
   EventHandlerSignature,
   EventName,
 } from "modules/types.ts";
@@ -11,8 +13,16 @@ export function isConjoinEvents(
   return Array.isArray(event) && event.length > 1;
 }
 
+export function isDualSignature(
+  signature: EventHandlerSignature<any>,
+): signature is DualEventHandlerSignature<any> {
+  return !!signature.options && "dual" in signature.options;
+}
+
 export function isDualHandler(
-  handler: EventHandlerSignature<any>,
-): handler is DualEventHandlerSignature<any> {
-  return !!handler.options && "dual" in handler.options;
+  handler: EventHandler | DualEventHandler,
+): handler is DualEventHandler {
+  return typeof handler === "object" && (
+    "true" in handler || "false" in handler
+  );
 }

@@ -1,10 +1,13 @@
 import type {
   ConjoinEvents,
+  DualEventHandler,
+  DualEventHandlerSignature,
   ErrorHandler,
   EventHandler,
   EventHandlerSignature,
   EventName,
   EventOptions,
+  GeneralEventHandlerSignature,
   PendingConjoinEvent,
   XConjoinEmitter,
 } from "modules/types.ts";
@@ -13,6 +16,7 @@ import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";
 import { SeriesRunner } from "modules/runners/series.ts";
 import { ConjoinQueue } from "modules/conjoin_queue.ts";
+import * as helpers from "modules/helpers.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
@@ -64,16 +68,17 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
 
   conjoin(
     events: ConjoinEvents,
-    handler: EventHandler,
+    handler: EventHandler | DualEventHandler,
     options?: Partial<EventOptions>,
   ) {
     const signature = {
       name: events,
       handler,
       options: {
-        once: options?.once || false,
+        once: options?.once,
+        dual: helpers.isDualHandler(handler),
       },
-    };
+    } as DualEventHandlerSignature<any> | GeneralEventHandlerSignature<any>;
     return this.internalConjoinOn(signature);
   }
 

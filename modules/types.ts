@@ -33,6 +33,7 @@ export type GeneralEventHandlerSignature<T> = {
   options?: Partial<
     EventOptions & {
       async: boolean;
+      dual: boolean;
     }
   >;
 };
@@ -45,19 +46,13 @@ export type EventUnscriber = () => void;
 
 export type EventRegister = (
   event: EventName,
-  handler: EventHandler,
-  options?: Partial<EventOptions>,
-) => EventUnscriber;
-
-export type DualEventRegister = (
-  event: EventName,
-  handlers: DualEventHandler,
+  handler: EventHandler | DualEventHandler,
   options?: Partial<EventOptions>,
 ) => EventUnscriber;
 
 export type ConjoinEventsRegister = (
   events: ConjoinEvents,
-  handler: EventHandler,
+  handler: EventHandler | DualEventHandler,
   options?: Partial<EventOptions>,
 ) => EventUnscriber;
 
@@ -92,9 +87,6 @@ export type XCoreEmitter<T> =
   & EventUnregister<T>;
 
 export type XevtEmitter =
-  & {
-    onDual: DualEventRegister;
-  }
   & XCoreEmitter<EventName>
   & Record<
     | "addEventListener"

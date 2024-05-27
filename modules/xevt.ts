@@ -1,5 +1,6 @@
 import type {
   ConjoinEvents,
+  DualEventHandler,
   ErrorHandler,
   EventHandler,
   EventName,
@@ -41,7 +42,7 @@ export class Xevt extends CoreEmitter<XeventName>
 
   on(
     event: XeventName,
-    handler: EventHandler,
+    handler: EventHandler | DualEventHandler,
     options?: Partial<EventOptions>,
   ) {
     if (isConjoinEvents(event)) {
@@ -49,10 +50,6 @@ export class Xevt extends CoreEmitter<XeventName>
     } else {
       return this.emitter.on(event, handler, options);
     }
-  }
-
-  get onDual() {
-    return this.emitter.onDual.bind(this.emitter);
   }
 
   get addEventListener() {
