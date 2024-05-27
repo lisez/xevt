@@ -1,10 +1,5 @@
-import type {
-  EventHandlerSignature,
-  EventName,
-  RegisteredHandlers,
-} from "modules/types.ts";
+import type { EventName, RegisteredHandlers } from "modules/types.ts";
 
-import { SequenceRunner } from "modules/runners/sequence.ts";
 import { StepRunner } from "modules/runners/step.ts";
 
 /**
@@ -17,18 +12,6 @@ export class SeriesRunner {
    */
   constructor(private handlers: RegisteredHandlers) {
     this.handlers = handlers;
-  }
-
-  /**
-   * Remove a handler.
-   * @param key The event name.
-   * @param profile The handler profile.
-   */
-  private remove(key: EventName, profile: EventHandlerSignature<any>): void {
-    const handlers = this.handlers.get(key);
-    if (!handlers) return;
-    const idx = handlers.findIndex((h) => h.handler === profile.handler);
-    if (idx !== -1) handlers.splice(idx, 1);
   }
 
   /**
