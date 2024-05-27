@@ -11,7 +11,7 @@ import type {
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";
-import { SequenceRunner } from "modules/runners/sequence.ts";
+import { SeriesRunner } from "modules/runners/series.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
@@ -122,23 +122,9 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     return { fulfill, idle };
   }
 
-  private exec(pointer: number, events: EventName[]): any {
-    const event = events[pointer];
-    if (!event) return;
-
-    const handlers = this.handlers.get(event)?.slice() || [];
-    for (const e of handlers.filter((e) => e.options?.once)) {
-      this.offByHandler(event, e.handler);
-    }
-
+  private exec(events: EventName[]): any {
     try {
-      if (handlers.length) {
-        const result = new SequenceRunner(handlers).exec(0);
-        if (result) {
-          return result.then(() => this.exec(pointer + 1, events));
-        }
-        return this.exec(pointer + 1, events);
-      }
+      return new SeriesRunner(this.handlers).exec(events);
     } catch (e) {
       this.errorEmitter.emit("error", e);
     }
@@ -166,9 +152,9 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     if (executing.length) {
       if (this.debug) this.logger.debug("conjoined", executing);
       if (this.prevEvents) {
-        this.prevEvents = this.prevEvents.then(() => this.exec(0, executing));
+        this.prevEvents = this.prevEvents.then(() => this.exec(executing));
       } else {
-        this.prevEvents = this.exec(0, executing);
+        this.prevEvents = this.exec(executing);
       }
     }
     return this.prevEvents;

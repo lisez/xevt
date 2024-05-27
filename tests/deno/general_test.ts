@@ -15,8 +15,8 @@ it("list all events", () => {
   assertEquals(emitter.eventNames(), [
     "foo",
     "bar",
-    "test1.test2",
-    "test2.test3",
+    "0.1",
+    "1.2",
   ]);
 });
 
