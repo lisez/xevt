@@ -51,6 +51,10 @@ export class Xevt extends CoreEmitter<XeventName>
     }
   }
 
+  get onDual() {
+    return this.emitter.onDual.bind(this.emitter);
+  }
+
   get addEventListener() {
     return this.on;
   }
