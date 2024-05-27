@@ -96,7 +96,7 @@ describe("Xevt - single event", () => {
   it("should listen every async events", async () => {
     const emitter = new Xevt();
     const result: number[] = [];
-    emitter.onAsync("event", async (arg) => {
+    emitter.on("event", async (arg) => {
       await new Promise((resolve) =>
         setTimeout(() => {
           result.push(arg);
@@ -122,7 +122,7 @@ describe("Xevt - single event", () => {
     emitter.on("event", (data) => {
       result.push(data);
     });
-    emitter.onAsync(
+    emitter.on(
       "event",
       async (data) =>
         new Promise((res) => {

@@ -68,8 +68,7 @@ export type XevtEmitter =
   & XCoreEmitter<EventName>
   & Record<
     | "addEventListener"
-    | Uncapitalize<EventRegisterName>
-    | Uncapitalize<`${EventRegisterName}Async`>,
+    | Uncapitalize<EventRegisterName>,
     EventRegister
   >;
 
@@ -78,8 +77,7 @@ export type XConjoinEmitter =
   & Record<
     | "addEventListener"
     | "on"
-    | Uncapitalize<ConjoinEventsRegisterName>
-    | Uncapitalize<`${ConjoinEventsRegisterName}Async`>,
+    | Uncapitalize<ConjoinEventsRegisterName>,
     ConjoinEventsRegister
   >;
 

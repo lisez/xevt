@@ -42,7 +42,7 @@ emitter.emit("event");
 const emitter = new Xevt();
 
 let result = 0;
-emitter.onAsync("event", async () => {
+emitter.on("event", async () => {
   result++;
 });
 await emitter.emit("event");
@@ -73,7 +73,7 @@ const result: number[] = [];
 emitter.on("event", (data) => {
   result.push(data);
 });
-emitter.onAsync(
+emitter.on(
   "event",
   async (data) =>
     new Promise((res) => {
@@ -97,7 +97,7 @@ const result: number[] = [];
 emitter.conjoin(["event1", "event2"], async () => {
   result.push(1);
 });
-emitter.conjoinAsync(["event1", "event2"], async () => {
+emitter.conjoin(["event1", "event2"], async () => {
   result.push(2);
 });
 
