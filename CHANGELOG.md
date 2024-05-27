@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.0 (2024-05-28)
+
+- Support `onDual` method.
+- Drop `*Async` methods.
+
 ## v0.6.2 (2024-05-27)
 
 - Fix import map.
