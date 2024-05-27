@@ -2,7 +2,7 @@ import { Xevt } from "xevt";
 
 const emitter = new Xevt();
 emitter.on("event", (data) => {
-  console.log("sync hanlder:", data);
+  console.log("sync handler:", data);
 });
 emitter.onAsync(
   "event",
