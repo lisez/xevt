@@ -155,3 +155,133 @@ describe("Xevt - unscriber", () => {
     assertEquals(result, [1]);
   });
 });
+
+describe("Xevt - onDual", () => {
+  it('should listen event with "onDual"', () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    emitter.on("event", (arg: number) => {
+      result.push(arg);
+      return arg % 2 === 0;
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    assertEquals(result, [1, 99, 2, 100]);
+  });
+
+  it("should listen multiple onDual events", () => {
+    const emitter = new Xevt();
+    const result: any[] = [];
+    emitter.on("event", (arg: number) => {
+      result.push(arg);
+      return arg % 2 === 0;
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push("first");
+      },
+    });
+
+    emitter.onDual("event", {
+      false: () => {
+        result.push("fail");
+      },
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    assertEquals(result, [1, "fail", 99, 2, "first", 100]);
+  });
+
+  it("should listen once onDual event", () => {
+    const emitter = new Xevt();
+    const result: any[] = [];
+    emitter.on("event", (arg: number) => {
+      result.push(arg);
+      return arg % 2 === 0;
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push("first");
+      },
+    });
+
+    emitter.onDual("event", {
+      false: () => {
+        result.push("fail");
+      },
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    }, { once: true });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+
+    assertEquals(result, [1, "fail", 99, 2, "first", 1, "fail", 2, "first"]);
+  });
+
+  it("should listen async onDual events", async () => {
+    const emitter = new Xevt();
+    const result: any[] = [];
+    emitter.on("event", (arg: number) => {
+      result.push(arg);
+      return arg % 2 === 0;
+    });
+
+    emitter.onDual("event", {
+      true: async () => {
+        result.push("first");
+      },
+    });
+
+    emitter.onDual("event", {
+      false: async () => {
+        result.push("fail");
+      },
+    });
+
+    emitter.onDual("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    await delay(10);
+    assertEquals(result, [1, "fail", 99, 2, "first", 100]);
+  });
+});
