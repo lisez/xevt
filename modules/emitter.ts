@@ -5,11 +5,13 @@ import type {
   EventHandler,
   EventName,
   EventOptions,
+  GeneralEventHandlerSignature,
   XevtEmitter,
 } from "modules/types.ts";
 
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { StepRunner } from "modules/runners/step.ts";
+import * as helpers from "modules/helpers.ts";
 
 export const EmitDone = Symbol("emit_done");
 
@@ -17,30 +19,19 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   private prevEvents?: Promise<void> | void;
   debug = false;
 
-  on(event: EventName, handler: EventHandler, options?: Partial<EventOptions>) {
+  on(
+    event: EventName,
+    handler: EventHandler | DualEventHandler,
+    options?: Partial<EventOptions>,
+  ) {
     const signature = {
       name: event,
       handler,
       options: {
         once: options?.once || event === EmitDone,
+        dual: helpers.isDualHandler(handler),
       },
-    };
-    return this.onBySignature(event, signature);
-  }
-
-  onDual(
-    event: EventName,
-    handler: DualEventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature: DualEventHandlerSignature<any> = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || event === EmitDone,
-        dual: true,
-      },
-    };
+    } as DualEventHandlerSignature<any> | GeneralEventHandlerSignature<any>;
     return this.onBySignature(event, signature);
   }
 

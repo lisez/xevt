@@ -6,7 +6,7 @@ features:
 
 - can listen async/conjoined event.
 - support to mixed async/sync handlers
-- conditional event handlers. (onDual)
+- conditional event handlers.
 - return unscriber when you subscribe an event.
 
 [![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg)](https://coveralls.io/github/lisez/xevt) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -61,19 +61,19 @@ emitter.on("event", (arg: number) => {
   return arg % 2 === 0;
 });
 
-emitter.onDual("event", {
+emitter.on("event", {
   true: async () => {
     result.push("first");
   },
 });
 
-emitter.onDual("event", {
+emitter.on("event", {
   false: async () => {
     result.push("fail");
   },
 });
 
-emitter.onDual("event", {
+emitter.on("event", {
   true: () => {
     result.push(100);
   },

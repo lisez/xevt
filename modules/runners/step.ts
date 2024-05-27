@@ -91,7 +91,7 @@ export class StepRunner {
       if (x.options?.once) {
         y.once.push(x);
       }
-      if (helpers.isDualHandler(x)) {
+      if (helpers.isDualSignature(x)) {
         y.duals.push(x);
       } else {
         y.handlers.push(x);
@@ -120,7 +120,7 @@ export class StepRunner {
     const handlers = this.handlers.get(step)?.slice() || [];
     if (!handlers.length) return;
 
-    const hasDual = handlers.some(helpers.isDualHandler);
+    const hasDual = handlers.some(helpers.isDualSignature);
     if (!hasDual) {
       return this.execInSequence(
         step,
