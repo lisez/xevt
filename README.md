@@ -5,7 +5,8 @@ another event emiiter.
 features:
 
 - can listen async/conjoined event.
-- support to mixed async/sync handlers.
+- support to mixed async/sync handlers
+- conditional event handlers. (onDual)
 - return unscriber when you subscribe an event.
 
 [![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg)](https://coveralls.io/github/lisez/xevt) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -46,6 +47,45 @@ emitter.on("event", async () => {
   result++;
 });
 await emitter.emit("event");
+```
+
+### Conditional event handlers.
+
+IMPORTANT: conditional handlers not supported to conjoined event.
+
+```typescript
+const emitter = new Xevt();
+const result: any[] = [];
+emitter.on("event", (arg: number) => {
+  result.push(arg);
+  return arg % 2 === 0;
+});
+
+emitter.onDual("event", {
+  true: async () => {
+    result.push("first");
+  },
+});
+
+emitter.onDual("event", {
+  false: async () => {
+    result.push("fail");
+  },
+});
+
+emitter.onDual("event", {
+  true: () => {
+    result.push(100);
+  },
+  false: () => {
+    result.push(99);
+  },
+});
+
+emitter.emit("event", 1);
+emitter.emit("event", 2);
+await delay(10);
+// [1, "fail", 99, 2, "first", 100]
 ```
 
 ### Conjoined event

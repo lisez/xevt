@@ -1,4 +1,5 @@
 import type {
+  DualEventHandler,
   ErrorHandler,
   EventHandler,
   EventHandlerSignature,
@@ -59,7 +60,10 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     this.handlers.delete(event);
   }
 
-  protected offByHandler(event: EventName, handler: EventHandler): void {
+  protected offByHandler(
+    event: EventName,
+    handler: EventHandler | DualEventHandler,
+  ): void {
     const handlers = this.handlers.get(event);
     if (!handlers?.length) return;
     const idx = handlers.findIndex((h) => h.handler === handler);
