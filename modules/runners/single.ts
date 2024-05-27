@@ -1,4 +1,4 @@
-import { EventHandlerSignature } from "modules/types.ts";
+import type { EventHandlerSignature } from "modules/types.ts";
 
 /**
  * The result of a single runner.

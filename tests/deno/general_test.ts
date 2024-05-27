@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertIsError } from "jsr:@std/assert";
-import { describe, it } from "jsr:@std/testing/bdd";
+import { it } from "jsr:@std/testing/bdd";
 
 import { Xevt } from "modules/xevt.ts";
 

@@ -124,6 +124,7 @@ describe("Xevt - single event", () => {
     });
     emitter.on(
       "event",
+      // deno-lint-ignore require-await
       async (data) =>
         new Promise((res) => {
           setTimeout(() => {
