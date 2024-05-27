@@ -1,10 +1,9 @@
 import type {
   DualEventHandlerSignature,
-  EventHandlerSignature,
   GeneralEventHandlerSignature,
 } from "modules/types.ts";
 
-import { SingleRunner } from "modules/runners/single.ts";
+import { SequenceRunner } from "modules/runners/sequence.ts";
 
 /**
  * Run a dual event handler.
@@ -12,12 +11,31 @@ import { SingleRunner } from "modules/runners/single.ts";
 export class DualRunner<N = any> {
   /**
    * Create a new instance of the DualRunner.
-   * @param profile The dual handler profile.
+   * @param handlers The dual handler profile.
    */
   constructor(
-    private profile: DualEventHandlerSignature<N>,
+    private handlers: DualEventHandlerSignature<N>[],
   ) {
-    this.profile = profile;
+    this.handlers = handlers;
+  }
+
+  /**
+   * Conditionally filter the handlers.
+   * @param condition The condition to filter the handlers.
+   * @returns The filtered handlers.
+   */
+  private filterHandlers(
+    condition: boolean,
+  ): GeneralEventHandlerSignature<N>[] {
+    const handlers: GeneralEventHandlerSignature<N>[] = [];
+    for (const p of this.handlers) {
+      // @ts-ignore TS2538
+      if (typeof p.handler[condition] === "function") {
+        // @ts-ignore TS2538
+        handlers.push({ ...p, handler: p.handler[condition] });
+      }
+    }
+    return handlers;
   }
 
   /**
@@ -25,19 +43,9 @@ export class DualRunner<N = any> {
    * @param result The result of the handler.
    */
   private dualExec(result: any) {
-    if (!!result && "true" in this.profile.handler) {
-      return new SingleRunner({
-        ...this.profile,
-        handler: this.profile.handler.true,
-      }).exec(result);
-    }
-    if (!result && "false" in this.profile.handler) {
-      return new SingleRunner({
-        ...this.profile,
-        handler: this.profile.handler.false,
-      }).exec(result);
-    }
-    return;
+    const handlers = this.filterHandlers(!!result);
+    if (!handlers.length) return;
+    return new SequenceRunner(handlers).exec(0, result);
   }
 
   /**
