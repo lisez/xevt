@@ -27,9 +27,7 @@ export class SingleRunner<
    * Execute the handler.
    * @param args The arguments to pass to the handler.
    */
-  exec(
-    ...args: Parameters<T["handler"]>
-  ): SingleRunnerResult<T["handler"]> {
+  exec(args: Parameters<T["handler"]>): SingleRunnerResult<T["handler"]> {
     return this.profile.handler(...args);
   }
 }

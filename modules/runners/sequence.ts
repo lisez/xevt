@@ -20,28 +20,24 @@ export class SequenceRunner<
 
   /**
    * Execute the handlers in sequence.
-   * @param pointer The current handler index.
    * @param args The arguments to pass to the handlers.
+   * @param index The current handler index.
    */
   exec(
-    pointer: number = 0,
-    ...args: Parameters<N["handler"]>
+    args: Parameters<N["handler"]>,
+    index: number = 0,
   ): void | Promise<void> {
-    const profile = this.handlers[pointer];
+    const profile = this.handlers[index];
     if (!profile) return;
 
-    const result = new SingleRunner<N>(profile).exec(
-      ...args,
-    ) as any;
+    const result = new SingleRunner<N>(profile).exec(args) as any;
 
     /**
      * Wait for the handler to finish before moving to the next handler.
      */
     if (profile.options?.async || result instanceof Promise) {
-      return Promise.resolve(result).then(() =>
-        this.exec(pointer + 1, ...args)
-      );
+      return Promise.resolve(result).then(() => this.exec(args, index + 1));
     }
-    return this.exec(pointer + 1, ...args);
+    return this.exec(args, index + 1);
   }
 }

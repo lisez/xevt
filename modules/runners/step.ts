@@ -47,7 +47,7 @@ export class StepRunner {
     const handler = handlers[idx];
     if (!handler) return;
 
-    const result = new SingleRunner(handler).exec(...args);
+    const result = new SingleRunner(handler).exec(args);
 
     const next = (result: any) => {
       const dualResult = new DualRunner(duals).exec(!!result);
@@ -76,7 +76,7 @@ export class StepRunner {
       this.remove(step, p);
     }
     return new SequenceRunner(handlers as GeneralEventHandlerSignature<any>[])
-      .exec(0, ...args);
+      .exec(args);
   }
 
   /**

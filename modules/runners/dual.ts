@@ -45,7 +45,7 @@ export class DualRunner<N = any> {
   private dualExec(result: any) {
     const handlers = this.filterHandlers(!!result);
     if (!handlers.length) return;
-    return new SequenceRunner(handlers).exec(0, result);
+    return new SequenceRunner(handlers).exec([result]);
   }
 
   /**
