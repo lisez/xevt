@@ -50,7 +50,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
       this.handlers.set(name, [signature]);
     }
 
-    return () => this.offByHandler(name, signature.handler);
+    return () => this.offByHandler(name, signature);
   }
 
   abstract error(handler: ErrorHandler): void;
@@ -59,10 +59,13 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     this.handlers.delete(event);
   }
 
-  protected offByHandler(event: EventName, handler: EventHandler): void {
+  protected offByHandler(
+    event: EventName,
+    profile: EventHandlerSignature<any>,
+  ): void {
     const handlers = this.handlers.get(event);
     if (!handlers?.length) return;
-    const idx = handlers.findIndex((h) => h.handler === handler);
+    const idx = handlers.findIndex((h) => h.handler === profile.handler);
     if (idx !== -1) handlers.splice(idx, 1);
   }
 
