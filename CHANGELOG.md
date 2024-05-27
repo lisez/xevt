@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.0 (2024-05-28)
+
+- Extends `on` to support `onDual`.
+- Drop `onDual` method.
+
 ## v0.7.0 (2024-05-28)
 
 - Support `onDual` method.
