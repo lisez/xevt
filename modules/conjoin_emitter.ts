@@ -12,14 +12,15 @@ import type {
 import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";
 import { SeriesRunner } from "modules/runners/series.ts";
+import { ConjoinQueue } from "modules/conjoin_queue.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
   implements XConjoinEmitter {
   private nameIndex: Map<EventName, number> = new Map();
   private conjoinedNames: Map<EventName, ConjoinEvents> = new Map();
   private indexCounter = 0;
-  private waitingQueue: PendingConjoinEvent[] = [];
-  private idleQueue: PendingConjoinEvent[] = [];
+  private waitingQueue = new ConjoinQueue();
+  private idleQueue = new ConjoinQueue();
   private errorEmitter = new Emitter();
   private prevEvents?: Promise<any>;
   debug = false;
@@ -101,27 +102,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     this.errorEmitter.on("error", handler);
   }
 
-  private scan(event: EventName, queue: PendingConjoinEvent[]) {
-    const fulfill: EventName[] = [];
-    const idle: PendingConjoinEvent[] = [];
-
-    for (const pending of queue) {
-      const found = pending.conjoined.indexOf(event);
-      if (found === -1) {
-        idle.push(pending);
-      } else {
-        pending.conjoined.splice(found, 1);
-        if (pending.conjoined.length === 0) {
-          fulfill.push(pending.event);
-        } else {
-          idle.push(pending);
-        }
-      }
-    }
-
-    return { fulfill, idle };
-  }
-
   private exec(events: EventName[]): any {
     try {
       return new SeriesRunner(this.handlers).exec(events);
@@ -138,16 +118,18 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     let nextIdle: PendingConjoinEvent[] = [];
 
     for (const queue of [this.waitingQueue, this.idleQueue]) {
-      const { fulfill, idle } = this.scan(event, queue);
+      const { fulfill, idle } = queue.consume(event);
       executing = executing.concat(fulfill);
       nextIdle = nextIdle.concat(idle);
     }
 
-    this.idleQueue = nextIdle;
-    this.waitingQueue = executing.map((e) => ({
-      event: e,
-      conjoined: this.conjoinedNames.get(e)?.slice() || [],
-    }));
+    this.idleQueue = new ConjoinQueue(nextIdle);
+    this.waitingQueue = new ConjoinQueue(
+      executing.map((e) => ({
+        event: e,
+        conjoined: this.conjoinedNames.get(e)?.slice() || [],
+      })),
+    );
 
     if (executing.length) {
       if (this.debug) this.logger.debug("conjoined", executing);
