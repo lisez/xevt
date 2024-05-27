@@ -85,22 +85,6 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
     return this.conjoin;
   }
 
-  conjoinAsync(
-    events: ConjoinEvents,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: events,
-      handler,
-      options: {
-        once: options?.once || false,
-        async: true,
-      },
-    };
-    return this.internalConjoinOn(signature);
-  }
-
   error(handler: ErrorHandler) {
     this.errorEmitter.on("error", handler);
   }

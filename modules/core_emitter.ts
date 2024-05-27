@@ -34,14 +34,12 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     name: EventName,
     signature: EventHandlerSignature<any>,
   ): EventUnscriber {
-    if (
-      signature.options?.async &&
-      // @ts-ignore TS7053
-      signature.handler[Symbol.toStringTag] !== "AsyncFunction" &&
-      !("then" in signature.handler)
-    ) {
-      throw new Error("Async handler must be a promise or thenable");
-    }
+    // @ts-ignore TS7053
+    const async = signature.handler[Symbol.toStringTag] === "AsyncFunction" ||
+      ("then" in signature.handler);
+
+    signature.options ??= {};
+    signature.options.async = async;
 
     if (this.debug) this.logger.debug("on", name, signature);
 

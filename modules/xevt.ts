@@ -55,16 +55,8 @@ export class Xevt extends CoreEmitter<XeventName>
     return this.on;
   }
 
-  get onAsync() {
-    return this.emitter.onAsync.bind(this.emitter);
-  }
-
   get conjoin() {
     return this.conjoinEmitter.conjoin.bind(this.conjoinEmitter);
-  }
-
-  get conjoinAsync() {
-    return this.conjoinEmitter.conjoinAsync.bind(this.conjoinEmitter);
   }
 
   error(handler: ErrorHandler) {

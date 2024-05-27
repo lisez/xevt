@@ -54,10 +54,10 @@ describe("Xevt - multiple events", () => {
   it("should listen multiple async handlers", async () => {
     const emitter = new Xevt();
     const result: number[] = [];
-    emitter.conjoinAsync(["event1", "event2"], async () => {
+    emitter.conjoin(["event1", "event2"], async () => {
       result.push(1);
     });
-    emitter.conjoinAsync(["event1", "event2"], async () => {
+    emitter.conjoin(["event1", "event2"], async () => {
       result.push(2);
     });
     emitter.emit("event1");
@@ -132,7 +132,7 @@ describe("Xevt - multiple events", () => {
   it("should take every async events", async () => {
     const emitter = new Xevt();
     let result: number = 0;
-    emitter.conjoinAsync(["event1", "event2"], async () => {
+    emitter.conjoin(["event1", "event2"], async () => {
       await new Promise((resolve) =>
         setTimeout(() => {
           result++;
@@ -158,7 +158,7 @@ describe("Xevt - multiple events", () => {
     emitter.conjoin(["event1", "event2"], () => {
       result.push(1);
     });
-    emitter.conjoinAsync(["event1", "event2"], async () => {
+    emitter.conjoin(["event1", "event2"], async () => {
       result.push(2);
     });
 

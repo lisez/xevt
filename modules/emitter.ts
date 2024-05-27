@@ -30,22 +30,6 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
     return this.on;
   }
 
-  onAsync(
-    event: EventName,
-    handler: EventHandler,
-    options?: Partial<EventOptions>,
-  ) {
-    const signature = {
-      name: event,
-      handler,
-      options: {
-        once: options?.once || false,
-        async: true,
-      },
-    };
-    return this.onBySignature(event, signature);
-  }
-
   error(handler: ErrorHandler) {
     this.on("error", handler);
   }
