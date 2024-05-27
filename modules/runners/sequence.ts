@@ -32,12 +32,12 @@ export class SequenceRunner<
 
     const result = new SingleRunner<N>(profile).exec(
       ...args,
-    );
+    ) as any;
 
     /**
      * Wait for the handler to finish before moving to the next handler.
      */
-    if (profile.options?.async) {
+    if (profile.options?.async || result instanceof Promise) {
       return Promise.resolve(result).then(() =>
         this.exec(pointer + 1, ...args)
       );

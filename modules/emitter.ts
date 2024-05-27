@@ -56,16 +56,15 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
   emit(event: EventName, ...args: any[]): any {
     if (this.debug) this.logger.debug("emit", event, args);
 
-    const next = () => {
-      this.prevEvents = new StepRunner(this.handlers).exec(event, args);
-      return this.prevEvents;
-    };
-
     try {
       if (this.prevEvents instanceof Promise) {
-        return Promise.resolve(this.prevEvents).then(next);
+        this.prevEvents = this.prevEvents.then(() =>
+          this.prevEvents = new StepRunner(this.handlers).exec(event, args)
+        );
+      } else {
+        this.prevEvents = new StepRunner(this.handlers).exec(event, args);
       }
-      return next();
+      return this.prevEvents;
     } catch (err) {
       this.emit("error", err);
     } finally {
