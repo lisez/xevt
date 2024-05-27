@@ -9,6 +9,7 @@ import type {
 } from "modules/types.ts";
 
 import { Logger } from "modules/logger.ts";
+import { DualEventHandler } from "modules/types.ts";
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
@@ -50,7 +51,7 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
       this.handlers.set(name, [signature]);
     }
 
-    return () => this.offByHandler(name, signature);
+    return () => this.offByHandler(name, signature.handler);
   }
 
   abstract error(handler: ErrorHandler): void;
@@ -61,11 +62,11 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
 
   protected offByHandler(
     event: EventName,
-    profile: EventHandlerSignature<any>,
+    handler: EventHandler | DualEventHandler,
   ): void {
     const handlers = this.handlers.get(event);
     if (!handlers?.length) return;
-    const idx = handlers.findIndex((h) => h.handler === profile.handler);
+    const idx = handlers.findIndex((h) => h.handler === handler);
     if (idx !== -1) handlers.splice(idx, 1);
   }
 
