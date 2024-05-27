@@ -16,7 +16,7 @@ export function isConjoinEvents(
 export function isDualSignature(
   signature: EventHandlerSignature<any>,
 ): signature is DualEventHandlerSignature<any> {
-  return !!signature.options && "dual" in signature.options;
+  return !!signature.options?.dual;
 }
 
 export function isDualHandler(
