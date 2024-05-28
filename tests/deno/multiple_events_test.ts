@@ -139,7 +139,7 @@ describe("Xevt - multiple events", () => {
         setTimeout(() => {
           result++;
           resolve(true);
-        }, 10)
+        }, 1)
       );
     });
     emitter.emit("event1");
@@ -150,7 +150,7 @@ describe("Xevt - multiple events", () => {
     emitter.emit("event2");
     emitter.emit("event1");
     emitter.emit("event2");
-    await delay(100);
+    await delay(15);
     assertEquals(result, 4);
   });
 
@@ -169,7 +169,7 @@ describe("Xevt - multiple events", () => {
       emitter.emit("event1");
       emitter.emit("event2");
     }
-    await delay(100);
+    await delay(10);
     assertEquals(result, [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]);
   });
 });
