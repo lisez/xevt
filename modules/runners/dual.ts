@@ -4,6 +4,7 @@ import type {
 } from "modules/types.ts";
 
 import { SequenceRunner } from "modules/runners/sequence.ts";
+import { RelayRunner } from "modules/runners/relay.ts";
 
 /**
  * Run a dual event handler.
@@ -53,9 +54,6 @@ export class DualRunner<N = any> {
    * @param args The arguments to pass to the dual handler.
    */
   exec(result: any) {
-    if (result instanceof Promise) {
-      return Promise.resolve(result).then((res) => this.dualExec(res));
-    }
-    return this.dualExec(result);
+    return new RelayRunner().exec(result, (p) => this.dualExec(p));
   }
 }

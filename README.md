@@ -107,6 +107,8 @@ console.log(count); // 1
 
 ### Mixed async/sync handlers
 
+Non-blocking in default.
+
 ```typescript
 const emitter = new Xevt();
 const result: number[] = [];
@@ -128,26 +130,38 @@ for (let i = 0; i < 5; i++) {
   emitter.emit("event", i);
 }
 
-// [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
+// [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
 ```
+
+Blocking mode.
 
 ```typescript
 const emitter = new Xevt();
 const result: number[] = [];
-emitter.conjoin(["event1", "event2"], async () => {
-  result.push(1);
+emitter.on("event", (data) => {
+  result.push(data);
 });
-emitter.conjoin(["event1", "event2"], async () => {
-  result.push(2);
-});
+emitter.on(
+  "event",
+  // deno-lint-ignore require-await
+  async (data) =>
+    new Promise((res) => {
+      setTimeout(() => {
+        result.push(data);
+        res(true);
+      }, 1);
+    }),
+  { async: true },
+);
 
 for (let i = 0; i < 5; i++) {
-  emitter.emit("event1");
-  emitter.emit("event2");
+  emitter.emit("event", i);
 }
+await delay(15);
 
-// [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+// [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 ```
+
 
 ## Return unscriber after registered an event
 

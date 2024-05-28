@@ -16,6 +16,7 @@ import { CoreEmitter } from "modules/core_emitter.ts";
 import { Emitter } from "modules/emitter.ts";
 import { SeriesRunner } from "modules/runners/series.ts";
 import { ConjoinQueue } from "modules/conjoin_queue.ts";
+import { RelayRunner } from "modules/runners/relay.ts";
 import * as helpers from "modules/helpers.ts";
 
 export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
@@ -76,6 +77,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once,
+        async: options?.async,
         dual: helpers.isDualHandler(handler),
       },
     } as DualEventHandlerSignature<any> | GeneralEventHandlerSignature<any>;
@@ -136,10 +138,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       return this.prevEvents;
     };
 
-    if (this.prevEvents instanceof Promise) {
-      return Promise.resolve(this.prevEvents).then(next);
-    }
-    return next();
+    return new RelayRunner().exec(this.prevEvents, next, { async: true });
   }
 
   off(event: ConjoinEvents, handler?: EventHandler): void {

@@ -9,6 +9,7 @@ import type {
 import { DualRunner } from "modules/runners/dual.ts";
 import { SingleRunner } from "modules/runners/single.ts";
 import { SequenceRunner } from "modules/runners/sequence.ts";
+import { RelayRunner } from "modules/runners/relay.ts";
 import * as helpers from "modules/helpers.ts";
 
 /**
@@ -51,17 +52,13 @@ export class StepRunner {
 
     const next = (result: any) => {
       const dualResult = new DualRunner(duals).exec(!!result);
-      if (dualResult instanceof Promise) {
-        return dualResult.then(() =>
-          this.execByIndex(handlers, duals, args, idx + 1)
-        );
-      }
+      return new RelayRunner().exec(
+        dualResult,
+        () => this.execByIndex(handlers, duals, args, idx + 1),
+      );
     };
 
-    if (handler.options?.async) {
-      return Promise.resolve(result).then(() => next(result));
-    }
-    return next(result);
+    return new RelayRunner().exec(result, next, handler.options) as any;
   }
 
   /**

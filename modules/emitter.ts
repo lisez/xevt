@@ -29,6 +29,7 @@ export class Emitter extends CoreEmitter<EventName> implements XevtEmitter {
       handler,
       options: {
         once: options?.once || event === EmitDone,
+        async: !!options?.async,
         dual: helpers.isDualHandler(handler),
       },
     } as DualEventHandlerSignature<any> | GeneralEventHandlerSignature<any>;

@@ -10,6 +10,7 @@ import type {
 } from "modules/types.ts";
 
 import { Logger } from "modules/logger.ts";
+import * as helpers from "modules/helpers.ts";
 
 export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
   protected handlers: RegisteredHandlers;
@@ -35,14 +36,13 @@ export abstract class CoreEmitter<T> implements XCoreEmitter<T> {
     name: EventName,
     signature: EventHandlerSignature<any>,
   ): EventUnscriber {
-    // @ts-ignore TS7053
-    const async = signature.handler[Symbol.toStringTag] === "AsyncFunction" ||
-      ("then" in signature.handler);
-
-    signature.options ??= {};
-    signature.options.async = async;
-
     if (this.debug) this.logger.debug("on", name, signature);
+
+    if (
+      signature.options?.async && !helpers.isAsyncFunction(signature.handler)
+    ) {
+      delete signature.options.async;
+    }
 
     const handlers = this.handlers.get(name);
     if (handlers) {

@@ -8,6 +8,7 @@ export type ErrorHandler = (error: unknown) => void;
 
 export type EventOptions = {
   once: boolean;
+  async: boolean;
 };
 
 export type DualEventHandler =
@@ -19,11 +20,7 @@ export type DualEventHandlerSignature<T> = {
   name: T;
   handler: DualEventHandler;
   options:
-    & Partial<
-      EventOptions & {
-        async: boolean;
-      }
-    >
+    & Partial<EventOptions>
     & { dual: true };
 };
 

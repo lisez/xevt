@@ -1,6 +1,7 @@
 import type { GeneralEventHandlerSignature } from "modules/types.ts";
 
 import { SingleRunner } from "modules/runners/single.ts";
+import { RelayRunner } from "modules/runners/relay.ts";
 
 /**
  * Run handlers in sequence.
@@ -26,18 +27,15 @@ export class SequenceRunner<
   exec(
     args: Parameters<N["handler"]>,
     index: number = 0,
-  ): void | Promise<void> {
+  ): ReturnType<N["handler"]> | Promise<ReturnType<N["handler"]>> | void {
     const profile = this.handlers[index];
     if (!profile) return;
 
     const result = new SingleRunner<N>(profile).exec(args) as any;
-
-    /**
-     * Wait for the handler to finish before moving to the next handler.
-     */
-    if (profile.options?.async || result instanceof Promise) {
-      return Promise.resolve(result).then(() => this.exec(args, index + 1));
-    }
-    return this.exec(args, index + 1);
+    return new RelayRunner().exec(
+      result,
+      () => this.exec(args, index + 1),
+      profile.options,
+    ) as any;
   }
 }

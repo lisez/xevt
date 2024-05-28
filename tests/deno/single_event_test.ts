@@ -116,7 +116,7 @@ describe("Xevt - single event", () => {
     assertEquals(result, [1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it("mix handlers", async () => {
+  it("mix handlers - blocking", async () => {
     const emitter = new Xevt();
     const result: number[] = [];
     emitter.on("event", (data) => {
@@ -130,15 +130,42 @@ describe("Xevt - single event", () => {
           setTimeout(() => {
             result.push(data);
             res(true);
-          }, 10);
+          }, 1);
         }),
+      { async: true },
     );
 
     for (let i = 0; i < 5; i++) {
       emitter.emit("event", i);
     }
-    await delay(100);
+    await delay(15);
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
+  });
+
+  it("mix handlers - non-blocking", async () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    emitter.on("event", (data) => {
+      result.push(data);
+    });
+    emitter.on(
+      "event",
+      // deno-lint-ignore require-await
+      async (data) =>
+        new Promise((res) => {
+          setTimeout(() => {
+            result.push(data);
+            res(true);
+          }, 1);
+        }),
+      { async: false },
+    );
+
+    for (let i = 0; i < 5; i++) {
+      emitter.emit("event", i);
+    }
+    await delay(15);
+    assertEquals(result, [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]);
   });
 });
 
