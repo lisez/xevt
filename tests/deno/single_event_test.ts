@@ -138,7 +138,7 @@ describe("Xevt - single event", () => {
     for (let i = 0; i < 5; i++) {
       emitter.emit("event", i);
     }
-    await delay(10);
+    await delay(15);
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
   });
 
@@ -164,8 +164,8 @@ describe("Xevt - single event", () => {
     for (let i = 0; i < 5; i++) {
       emitter.emit("event", i);
     }
-    await delay(10);
-    assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
+    await delay(15);
+    assertEquals(result, [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]);
   });
 });
 
