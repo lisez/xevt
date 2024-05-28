@@ -141,6 +141,32 @@ describe("Xevt - single event", () => {
     await delay(10);
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
   });
+
+  it("mix handlers - non-blocking", async () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    emitter.on("event", (data) => {
+      result.push(data);
+    });
+    emitter.on(
+      "event",
+      // deno-lint-ignore require-await
+      async (data) =>
+        new Promise((res) => {
+          setTimeout(() => {
+            result.push(data);
+            res(true);
+          }, 1);
+        }),
+      { async: false },
+    );
+
+    for (let i = 0; i < 5; i++) {
+      emitter.emit("event", i);
+    }
+    await delay(10);
+    assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
+  });
 });
 
 describe("Xevt - unscriber", () => {
