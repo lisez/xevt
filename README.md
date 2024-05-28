@@ -166,6 +166,7 @@ await delay(15);
 // [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
+
 ## Return unscriber after registered an event
 
 ```typescript
