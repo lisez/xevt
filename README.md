@@ -9,7 +9,7 @@ features:
 - conditional event handlers.
 - return unscriber when you subscribe an event.
 
-[![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg)](https://coveralls.io/github/lisez/xevt) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Coverage Status](https://coveralls.io/repos/github/lisez/xevt/badge.svg)](https://coveralls.io/github/lisez/xevt) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![NPM Version](https://img.shields.io/npm/v/xevt)](https://www.npmjs.com/package/xevt) [![JSR](https://jsr.io/badges/@lisez/xevt)](https://jsr.io/@lisez/xevt)
 
 ## Installation
 
