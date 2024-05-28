@@ -183,11 +183,11 @@ describe("Xevt - unscriber", () => {
   });
 });
 
-describe("Xevt - on", () => {
+describe("Xevt - conditional event handlers", () => {
   it('should listen event with "on"', () => {
     const emitter = new Xevt();
     const result: number[] = [];
-    emitter.on("event", (arg: number) => {
+    emitter.on("event", async (arg: number) => {
       result.push(arg);
       return arg % 2 === 0;
     });
@@ -260,14 +260,18 @@ describe("Xevt - on", () => {
       },
     });
 
-    emitter.on("event", {
-      true: () => {
-        result.push(100);
+    emitter.on(
+      "event",
+      {
+        true: () => {
+          result.push(100);
+        },
+        false: () => {
+          result.push(99);
+        },
       },
-      false: () => {
-        result.push(99);
-      },
-    }, { once: true });
+      { once: true },
+    );
 
     emitter.emit("event", 1);
     emitter.emit("event", 2);
