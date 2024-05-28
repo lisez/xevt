@@ -14,9 +14,7 @@ export class DualRunner<N = any> {
    * Create a new instance of the DualRunner.
    * @param handlers The dual handler profile.
    */
-  constructor(
-    private handlers: DualEventHandlerSignature<N>[],
-  ) {
+  constructor(private handlers: DualEventHandlerSignature<N>[]) {
     this.handlers = handlers;
   }
 
@@ -54,6 +52,8 @@ export class DualRunner<N = any> {
    * @param args The arguments to pass to the dual handler.
    */
   exec(result: any) {
-    return new RelayRunner().exec(result, (p) => this.dualExec(p));
+    return new RelayRunner().exec(result, (p) => this.dualExec(p), {
+      async: true,
+    });
   }
 }

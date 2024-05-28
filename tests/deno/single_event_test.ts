@@ -183,7 +183,7 @@ describe("Xevt - unscriber", () => {
   });
 });
 
-describe("Xevt - on", () => {
+describe("Xevt - conditional event handlers", () => {
   it('should listen event with "on"', () => {
     const emitter = new Xevt();
     const result: number[] = [];
@@ -203,6 +203,58 @@ describe("Xevt - on", () => {
 
     emitter.emit("event", 1);
     emitter.emit("event", 2);
+    assertEquals(result, [1, 99, 2, 100]);
+  });
+
+  it("should executed after async function", async () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    // deno-lint-ignore require-await
+    emitter.on("event", async (arg: number) => {
+      result.push(arg);
+      return arg % 2 === 0;
+    });
+
+    emitter.on("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    await delay(0);
+    assertEquals(result, [1, 2, 99, 100]);
+  });
+
+  it("should executed after async function - blocking", async () => {
+    const emitter = new Xevt();
+    const result: number[] = [];
+    emitter.on(
+      "event",
+      // deno-lint-ignore require-await
+      async (arg: number) => {
+        result.push(arg);
+        return arg % 2 === 0;
+      },
+      { async: true },
+    );
+
+    emitter.on("event", {
+      true: () => {
+        result.push(100);
+      },
+      false: () => {
+        result.push(99);
+      },
+    });
+
+    emitter.emit("event", 1);
+    emitter.emit("event", 2);
+    await delay(0);
     assertEquals(result, [1, 99, 2, 100]);
   });
 
@@ -260,14 +312,18 @@ describe("Xevt - on", () => {
       },
     });
 
-    emitter.on("event", {
-      true: () => {
-        result.push(100);
+    emitter.on(
+      "event",
+      {
+        true: () => {
+          result.push(100);
+        },
+        false: () => {
+          result.push(99);
+        },
       },
-      false: () => {
-        result.push(99);
-      },
-    }, { once: true });
+      { once: true },
+    );
 
     emitter.emit("event", 1);
     emitter.emit("event", 2);

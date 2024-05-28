@@ -51,10 +51,9 @@ export class StepRunner {
     const result = new SingleRunner(handler).exec(args);
 
     const next = (result: any) => {
-      const dualResult = new DualRunner(duals).exec(!!result);
-      return new RelayRunner().exec(
-        dualResult,
-        () => this.execByIndex(handlers, duals, args, idx + 1),
+      const dualResult = new DualRunner(duals).exec(result);
+      return new RelayRunner().exec(dualResult, () =>
+        this.execByIndex(handlers, duals, args, idx + 1),
       );
     };
 
@@ -72,8 +71,9 @@ export class StepRunner {
     for (const p of handlers.filter((e) => !!e.options?.once)) {
       this.remove(step, p);
     }
-    return new SequenceRunner(handlers as GeneralEventHandlerSignature<any>[])
-      .exec(args);
+    return new SequenceRunner(
+      handlers as GeneralEventHandlerSignature<any>[],
+    ).exec(args);
   }
 
   /**
@@ -84,21 +84,24 @@ export class StepRunner {
     handlers: EventHandlerSignature<any>[],
     args?: any[],
   ) {
-    const categories = handlers.reduce((y, x) => {
-      if (x.options?.once) {
-        y.once.push(x);
-      }
-      if (helpers.isDualSignature(x)) {
-        y.duals.push(x);
-      } else {
-        y.handlers.push(x);
-      }
-      return y;
-    }, {
-      handlers: [] as GeneralEventHandlerSignature<any>[],
-      duals: [] as DualEventHandlerSignature<any>[],
-      once: [] as EventHandlerSignature<any>[],
-    });
+    const categories = handlers.reduce(
+      (y, x) => {
+        if (x.options?.once) {
+          y.once.push(x);
+        }
+        if (helpers.isDualSignature(x)) {
+          y.duals.push(x);
+        } else {
+          y.handlers.push(x);
+        }
+        return y;
+      },
+      {
+        handlers: [] as GeneralEventHandlerSignature<any>[],
+        duals: [] as DualEventHandlerSignature<any>[],
+        once: [] as EventHandlerSignature<any>[],
+      },
+    );
     if (!categories.handlers.length) return;
 
     for (const p of categories.once) {

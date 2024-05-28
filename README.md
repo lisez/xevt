@@ -51,12 +51,16 @@ await emitter.emit("event");
 
 ### Conditional event handlers.
 
-IMPORTANT: conditional handlers not supported to conjoined event.
+IMPORTANT:
+
+- NOT supported in conjoined events.
+- NOT supported any arguments in handlers.
+- It will be executed after the triggered event finished. (Blocking mode.)
 
 ```typescript
 const emitter = new Xevt();
 const result: any[] = [];
-emitter.on("event", (arg: number) => {
+emitter.on("event", async (arg: number) => {
   result.push(arg);
   return arg % 2 === 0;
 });
