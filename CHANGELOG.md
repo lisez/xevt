@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.0 (2024-05-28)
+
+- Non-blocking async in default.
+
 ## v0.8.0 (2024-05-28)
 
 - Extends `on` to support `onDual`.
