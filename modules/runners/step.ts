@@ -58,7 +58,7 @@ export class StepRunner {
       );
     };
 
-    return new RelayRunner().exec(result, next) as any;
+    return new RelayRunner().exec(result, next, handler.options) as any;
   }
 
   /**

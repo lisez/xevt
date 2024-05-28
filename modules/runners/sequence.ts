@@ -32,10 +32,10 @@ export class SequenceRunner<
     if (!profile) return;
 
     const result = new SingleRunner<N>(profile).exec(args) as any;
-
     return new RelayRunner().exec(
       result,
       () => this.exec(args, index + 1),
+      profile.options,
     ) as any;
   }
 }

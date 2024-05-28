@@ -22,7 +22,7 @@ export class RelayRunner {
     next: T,
     options?: Partial<RelayRunnerOptions>,
   ): Promise<ReturnType<T>> | ReturnType<T> {
-    if (prev instanceof Promise) {
+    if (prev instanceof Promise && options?.async) {
       return Promise.resolve(prev).then((res) => next(res));
     }
     return next(prev);
