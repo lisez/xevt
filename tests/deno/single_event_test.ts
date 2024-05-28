@@ -125,19 +125,15 @@ describe("Xevt - single event", () => {
     emitter.on(
       "event",
       // deno-lint-ignore require-await
-      async (data) =>
-        new Promise((res) => {
-          setTimeout(() => {
-            result.push(data);
-            res(true);
-          }, 10);
-        }),
+      async (data) => {
+        result.push(data);
+      },
     );
 
     for (let i = 0; i < 5; i++) {
       emitter.emit("event", i);
     }
-    await delay(100);
+    await delay(1);
     assertEquals(result, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]);
   });
 });
