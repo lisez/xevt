@@ -1,6 +1,7 @@
 import type { EventName, RegisteredHandlers } from "modules/types.ts";
 
 import { StepRunner } from "modules/runners/step.ts";
+import { RelayRunner } from "modules/runners/relay.ts";
 
 /**
  * Run handlers each in series.
@@ -24,9 +25,9 @@ export class SeriesRunner {
     if (!key) return;
 
     const step = new StepRunner(this.handlers).exec(key);
-    if (step instanceof Promise) {
-      return Promise.resolve(step).then(() => this.exec(series, idx + 1));
-    }
-    return this.exec(series, idx + 1);
+    return new RelayRunner().exec(
+      step,
+      () => this.exec(series, idx + 1),
+    ) as any;
   }
 }
