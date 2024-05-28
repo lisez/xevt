@@ -77,6 +77,7 @@ export class ConjoinEmitter extends CoreEmitter<ConjoinEvents>
       handler,
       options: {
         once: options?.once,
+        async: options?.async,
         dual: helpers.isDualHandler(handler),
       },
     } as DualEventHandlerSignature<any> | GeneralEventHandlerSignature<any>;

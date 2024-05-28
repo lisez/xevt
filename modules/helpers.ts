@@ -26,3 +26,14 @@ export function isDualHandler(
     "true" in handler || "false" in handler
   );
 }
+
+/**
+ * Check if a handler is an async function.
+ * @param handler The handler to check.
+ */
+export function isAsyncFunction(handler: any) {
+  // @ts-ignore TS7053
+  return (typeof handler === "function" &&
+    handler[Symbol.toStringTag] === "AsyncFunction") ||
+    ("then" in handler);
+}
