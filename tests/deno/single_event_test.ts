@@ -233,9 +233,9 @@ describe("Xevt - conditional event handlers", () => {
   it("should executed after async function - blocking", async () => {
     const emitter = new Xevt();
     const result: number[] = [];
-    // deno-lint-ignore require-await
     emitter.on(
       "event",
+      // deno-lint-ignore require-await
       async (arg: number) => {
         result.push(arg);
         return arg % 2 === 0;
